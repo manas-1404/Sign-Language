@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.models.schemas import FeedbackResponse, SignRequest
 from backend.agents.orchestrator import SignAnalysisOrchestrator
+from backend.utils.debug_image_writer import DebugImageWriter
 
 load_dotenv()
 
@@ -66,6 +67,8 @@ async def analyze_sign(sign_id: int, request: SignRequest) -> FeedbackResponse:
     """
     if sign_id < 1 or sign_id > 10:
         raise HTTPException(status_code=400, detail="sign_id must be between 1 and 10")
+
+    DebugImageWriter.save(sign_id, request.image_base64)
 
     orchestrator = SignAnalysisOrchestrator()
 

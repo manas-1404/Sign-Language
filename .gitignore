@@ -214,3 +214,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Debug images — captured webcam frames saved when SAVE_DEBUG_IMAGES=true
+backend/debug_images/

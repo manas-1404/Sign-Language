@@ -24,8 +24,12 @@ interface UseLessonStateReturn {
 export const useLessonState = (): UseLessonStateReturn => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
-  const currentSign = SIGNS[currentIndex];
+  // isComplete is true when the index reaches the end.
+  // currentSign is always clamped to the last valid entry so hooks that
+  // depend on currentSign.id never receive undefined — even after the
+  // lesson is complete and before the completion screen renders.
   const isComplete = currentIndex >= TOTAL_SIGNS;
+  const currentSign = SIGNS[Math.min(currentIndex, TOTAL_SIGNS - 1)];
 
   const nextSign = useCallback((): void => {
     setCurrentIndex((prev) => Math.min(prev + 1, TOTAL_SIGNS));

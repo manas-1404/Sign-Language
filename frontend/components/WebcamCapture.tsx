@@ -1,29 +1,25 @@
 "use client";
 
 /**
- * WebcamCapture — live webcam preview with 3-second countdown capture.
+ * WebcamCapture — live webcam preview with countdown and capture flash.
  *
  * Responsibilities:
- *   - Start/stop the camera based on the isCameraOn prop
- *   - Display the live feed when on, a placeholder when off
- *   - Run a 3-second countdown when isCapturing becomes true
- *   - Capture a still frame at countdown end and emit it via onCapture
+ *   - Start/stop the camera based on isCameraOn prop
+ *   - Show live feed when on, a placeholder when off
+ *   - When isCapturing becomes true: count down 3→2→1, then take the photo
+ *   - Show a "photo taken" flash so the user knows they can relax
+ *   - Emit the base64 JPEG via onCapture after the flash appears
  *
  * Does NOT call the API. Does NOT manage lesson state.
- * Camera on/off state lives in the parent so it can gate the API call.
  */
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWebcam } from "@/hooks/useWebcam";
 
 interface WebcamCaptureProps {
-  /** Whether the camera is currently active. Controlled by the parent. */
   isCameraOn: boolean;
-  /** Called when the user clicks the camera toggle button. */
   onToggleCamera: () => void;
-  /** Called with the base64 JPEG string when the countdown reaches zero. */
   onCapture: (imageBase64: string) => void;
-  /** When true the countdown starts automatically. */
   isCapturing: boolean;
 }
 
@@ -32,57 +28,68 @@ const COUNTDOWN_SECONDS = 3;
 const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: WebcamCaptureProps) => {
   const { videoRef, permissionStatus, startCamera, stopCamera, captureFrame } = useWebcam();
   const [countdown, setCountdown] = useState<number | null>(null);
-  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [photoTaken, setPhotoTaken] = useState(false);
 
-  // Start or stop the camera stream whenever isCameraOn changes.
+  // Keep callback refs fresh so the interval closure never goes stale.
+  const captureFrameRef = useRef(captureFrame);
+  const onCaptureRef = useRef(onCapture);
+  useEffect(() => { captureFrameRef.current = captureFrame; }, [captureFrame]);
+  useEffect(() => { onCaptureRef.current = onCapture; }, [onCapture]);
+
+  // Start or stop the camera stream based on isCameraOn.
   useEffect(() => {
     if (isCameraOn) {
       startCamera();
     } else {
-      clearInterval(countdownRef.current!);
-      setCountdown(null);
       stopCamera();
+      setCountdown(null);
+      setPhotoTaken(false);
     }
   }, [isCameraOn, startCamera, stopCamera]);
 
   // Cleanup on unmount.
   useEffect(() => () => stopCamera(), [stopCamera]);
 
-  const runCountdown = useCallback(() => {
-    setCountdown(COUNTDOWN_SECONDS);
-    countdownRef.current = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev === null || prev <= 1) {
-          clearInterval(countdownRef.current!);
-          return null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  }, []);
-
-  const hasFiredRef = useRef(false);
-
-  // Fire onCapture once the countdown finishes.
+  // Single effect owns the full countdown → capture → flash sequence.
   useEffect(() => {
-    if (countdown === null && isCapturing && !hasFiredRef.current) {
-      hasFiredRef.current = true;
-      const frame = captureFrame();
-      if (frame) onCapture(frame);
-    }
-    if (!isCapturing) hasFiredRef.current = false;
-  }, [countdown, isCapturing, captureFrame, onCapture]);
-
-  // Kick off the countdown when isCapturing becomes true.
-  useEffect(() => {
-    if (isCapturing && countdown === null && !hasFiredRef.current) {
-      runCountdown();
-    }
     if (!isCapturing) {
-      clearInterval(countdownRef.current!);
       setCountdown(null);
+      setPhotoTaken(false);
+      return;
     }
-  }, [isCapturing, countdown, runCountdown]);
+
+    let count = COUNTDOWN_SECONDS;
+    setCountdown(count);
+    setPhotoTaken(false);
+
+    const tick = setInterval(() => {
+      count -= 1;
+
+      if (count > 0) {
+        setCountdown(count);
+        return;
+      }
+
+      // Countdown reached zero — take the photo.
+      clearInterval(tick);
+      setCountdown(null);
+
+      const frame = captureFrameRef.current();
+      if (frame) {
+        setPhotoTaken(true);
+        onCaptureRef.current(frame);
+      }
+    }, 1000);
+
+    return () => clearInterval(tick);
+  }, [isCapturing]);
+
+  // Auto-hide the "photo taken" flash after 2.5 seconds.
+  useEffect(() => {
+    if (!photoTaken) return;
+    const timer = setTimeout(() => setPhotoTaken(false), 2500);
+    return () => clearTimeout(timer);
+  }, [photoTaken]);
 
   return (
     <div className="flex flex-col gap-2 w-full max-w-md mx-auto">
@@ -98,6 +105,7 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
             {permissionStatus === "denied" && <PermissionDeniedOverlay />}
             {permissionStatus === "error" && <ErrorOverlay />}
             {countdown !== null && <CountdownOverlay count={countdown} />}
+            {photoTaken && <PhotoTakenOverlay />}
           </>
         ) : (
           <CameraOffPlaceholder />
@@ -108,6 +116,25 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
     </div>
   );
 };
+
+const CountdownOverlay = ({ count }: { count: number }) => (
+  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm gap-3">
+    <p className="text-slate-300 text-sm font-medium uppercase tracking-widest">
+      Hold your sign…
+    </p>
+    <span className="text-9xl font-black text-white drop-shadow-lg leading-none">
+      {count}
+    </span>
+  </div>
+);
+
+const PhotoTakenOverlay = () => (
+  <div className="absolute inset-0 flex flex-col items-center justify-center bg-emerald-500/20 backdrop-blur-sm gap-3 border-4 border-emerald-400/60 rounded-2xl">
+    <span className="text-5xl">📸</span>
+    <p className="text-emerald-300 font-bold text-lg">Photo taken!</p>
+    <p className="text-slate-300 text-sm">You can relax now — analyzing…</p>
+  </div>
+);
 
 const CameraOffPlaceholder = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-500">
@@ -138,12 +165,6 @@ const CameraToggleButton = ({ isCameraOn, onToggle }: CameraToggleButtonProps) =
     <span>{isCameraOn ? "⏹" : "▶"}</span>
     {isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
   </button>
-);
-
-const CountdownOverlay = ({ count }: { count: number }) => (
-  <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <span className="text-8xl font-black text-white drop-shadow-lg">{count}</span>
-  </div>
 );
 
 const PermissionDeniedOverlay = () => (
