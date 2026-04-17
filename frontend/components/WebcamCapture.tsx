@@ -1,20 +1,22 @@
 "use client";
 
 /**
- * WebcamCapture — live webcam preview with countdown and capture flash.
+ * WebcamCapture — live webcam preview with countdown, capture flash, and
+ * optional background replacement.
  *
  * Responsibilities:
  *   - Start/stop the camera based on isCameraOn prop
- *   - Show live feed when on, a placeholder when off
- *   - When isCapturing becomes true: count down 3→2→1, then take the photo
+ *   - Optionally composite person over a neutral background via MediaPipe
+ *   - Count down 3→2→1 when isCapturing is true, then take the photo
  *   - Show a "photo taken" flash so the user knows they can relax
- *   - Emit the base64 JPEG via onCapture after the flash appears
+ *   - Emit the composited (or raw) base64 JPEG via onCapture
  *
  * Does NOT call the API. Does NOT manage lesson state.
  */
 
 import { useEffect, useRef, useState } from "react";
 import { useWebcam } from "@/hooks/useWebcam";
+import { useBackgroundReplacement } from "@/hooks/useBackgroundReplacement";
 
 interface WebcamCaptureProps {
   isCameraOn: boolean;
@@ -26,14 +28,21 @@ interface WebcamCaptureProps {
 const COUNTDOWN_SECONDS = 3;
 
 const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: WebcamCaptureProps) => {
-  const { videoRef, permissionStatus, startCamera, stopCamera, captureFrame } = useWebcam();
+  const { videoRef, permissionStatus, startCamera, stopCamera, captureFrame: captureRaw } = useWebcam();
+  const [bgEnabled, setBgEnabled] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [photoTaken, setPhotoTaken] = useState(false);
 
-  // Keep callback refs fresh so the interval closure never goes stale.
-  const captureFrameRef = useRef(captureFrame);
+  const { canvasRef, isModelLoading, captureFrame: captureComposited } =
+    useBackgroundReplacement(videoRef, bgEnabled && isCameraOn);
+
+  // Active capture function: composited canvas when bg is on, raw video when off.
+  const activeCaptureRef = useRef(captureRaw);
+  useEffect(() => {
+    activeCaptureRef.current = bgEnabled && !isModelLoading ? captureComposited : captureRaw;
+  }, [bgEnabled, isModelLoading, captureComposited, captureRaw]);
+
   const onCaptureRef = useRef(onCapture);
-  useEffect(() => { captureFrameRef.current = captureFrame; }, [captureFrame]);
   useEffect(() => { onCaptureRef.current = onCapture; }, [onCapture]);
 
   // Start or stop the camera stream based on isCameraOn.
@@ -47,7 +56,6 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
     }
   }, [isCameraOn, startCamera, stopCamera]);
 
-  // Cleanup on unmount.
   useEffect(() => () => stopCamera(), [stopCamera]);
 
   // Single effect owns the full countdown → capture → flash sequence.
@@ -64,17 +72,12 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
 
     const tick = setInterval(() => {
       count -= 1;
+      if (count > 0) { setCountdown(count); return; }
 
-      if (count > 0) {
-        setCountdown(count);
-        return;
-      }
-
-      // Countdown reached zero — take the photo.
       clearInterval(tick);
       setCountdown(null);
 
-      const frame = captureFrameRef.current();
+      const frame = activeCaptureRef.current();
       if (frame) {
         setPhotoTaken(true);
         onCaptureRef.current(frame);
@@ -96,12 +99,29 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
       <div className="relative rounded-2xl overflow-hidden bg-slate-800 aspect-video shadow-2xl">
         {isCameraOn ? (
           <>
+            {/* Raw video — always rendered so captureRaw works; hidden when bg is on */}
             <video
               ref={videoRef}
-              className="w-full h-full object-cover scale-x-[-1]"
+              className={[
+                "absolute inset-0 w-full h-full object-cover scale-x-[-1]",
+                bgEnabled && !isModelLoading ? "invisible" : "visible",
+              ].join(" ")}
               muted
               playsInline
             />
+
+            {/* Composited canvas — shown only when background replacement is active */}
+            {bgEnabled && (
+              <canvas
+                ref={canvasRef}
+                className={[
+                  "absolute inset-0 w-full h-full object-cover scale-x-[-1]",
+                  isModelLoading ? "invisible" : "visible",
+                ].join(" ")}
+              />
+            )}
+
+            {isModelLoading && <ModelLoadingOverlay />}
             {permissionStatus === "denied" && <PermissionDeniedOverlay />}
             {permissionStatus === "error" && <ErrorOverlay />}
             {countdown !== null && <CountdownOverlay count={countdown} />}
@@ -112,10 +132,20 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
         )}
       </div>
 
-      <CameraToggleButton isCameraOn={isCameraOn} onToggle={onToggleCamera} />
+      <div className="flex gap-2">
+        <CameraToggleButton isCameraOn={isCameraOn} onToggle={onToggleCamera} />
+        <BgToggleButton
+          enabled={bgEnabled}
+          loading={isModelLoading}
+          cameraOn={isCameraOn}
+          onToggle={() => setBgEnabled((prev) => !prev)}
+        />
+      </div>
     </div>
   );
 };
+
+// ─── Overlays ────────────────────────────────────────────────────────────────
 
 const CountdownOverlay = ({ count }: { count: number }) => (
   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm gap-3">
@@ -136,6 +166,13 @@ const PhotoTakenOverlay = () => (
   </div>
 );
 
+const ModelLoadingOverlay = () => (
+  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 gap-3">
+    <div className="w-6 h-6 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+    <p className="text-slate-300 text-sm">Loading background model…</p>
+  </div>
+);
+
 const CameraOffPlaceholder = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-500">
     <svg xmlns="http://www.w3.org/2000/svg" className="w-14 h-14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
@@ -145,26 +182,6 @@ const CameraOffPlaceholder = () => (
     <p className="text-sm font-medium">Camera is off</p>
     <p className="text-xs text-slate-600">Turn on the camera to start practicing</p>
   </div>
-);
-
-interface CameraToggleButtonProps {
-  isCameraOn: boolean;
-  onToggle: () => void;
-}
-
-const CameraToggleButton = ({ isCameraOn, onToggle }: CameraToggleButtonProps) => (
-  <button
-    onClick={onToggle}
-    className={[
-      "w-full py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2",
-      isCameraOn
-        ? "bg-slate-700 hover:bg-red-900/60 text-slate-300 hover:text-red-300 border border-slate-600 hover:border-red-800"
-        : "bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600",
-    ].join(" ")}
-  >
-    <span>{isCameraOn ? "⏹" : "▶"}</span>
-    {isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
-  </button>
 );
 
 const PermissionDeniedOverlay = () => (
@@ -183,6 +200,58 @@ const ErrorOverlay = () => (
     <p className="text-white font-semibold">Camera unavailable</p>
     <p className="text-slate-400 text-sm">No camera found or an error occurred.</p>
   </div>
+);
+
+// ─── Control buttons ──────────────────────────────────────────────────────────
+
+interface CameraToggleButtonProps {
+  isCameraOn: boolean;
+  onToggle: () => void;
+}
+
+const CameraToggleButton = ({ isCameraOn, onToggle }: CameraToggleButtonProps) => (
+  <button
+    onClick={onToggle}
+    className={[
+      "flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2",
+      isCameraOn
+        ? "bg-slate-700 hover:bg-red-900/60 text-slate-300 hover:text-red-300 border border-slate-600 hover:border-red-800"
+        : "bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600",
+    ].join(" ")}
+  >
+    <span>{isCameraOn ? "⏹" : "▶"}</span>
+    {isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
+  </button>
+);
+
+interface BgToggleButtonProps {
+  enabled: boolean;
+  loading: boolean;
+  cameraOn: boolean;
+  onToggle: () => void;
+}
+
+const BgToggleButton = ({ enabled, loading, cameraOn, onToggle }: BgToggleButtonProps) => (
+  <button
+    onClick={onToggle}
+    disabled={!cameraOn}
+    title={!cameraOn ? "Turn on camera first" : enabled ? "Disable background replacement" : "Replace background with neutral gray"}
+    className={[
+      "px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 border",
+      !cameraOn
+        ? "bg-slate-800 text-slate-600 border-slate-700 cursor-not-allowed"
+        : enabled
+          ? "bg-indigo-600/30 text-indigo-300 border-indigo-500/50 hover:bg-indigo-600/50"
+          : "bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600",
+    ].join(" ")}
+  >
+    {loading ? (
+      <div className="w-3.5 h-3.5 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+    ) : (
+      <span>🖼</span>
+    )}
+    BG
+  </button>
 );
 
 export default WebcamCapture;
