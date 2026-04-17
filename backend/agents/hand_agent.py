@@ -5,8 +5,6 @@ Ignores facial expression and body posture — those are handled by
 FaceAgent and BodyAgent respectively.
 """
 
-import json
-
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 
@@ -21,22 +19,15 @@ Your ONLY job is to evaluate the signer's hand configuration and finger position
 Do NOT comment on facial expression, eyebrow position, or body posture — those are
 evaluated by separate specialized agents.
 
-Given an image of someone attempting an ASL sign and the reference description of
-the correct hand shape, you must return a JSON object with exactly these two fields:
-  - "correct": boolean — true if the hand shape matches the reference, false otherwise
-  - "feedback": string — 1 to 2 sentences maximum, specific and actionable
-
 Focus on: finger positions, hand orientation, handshape accuracy, and movement direction.
-Be precise and constructive. Do not include pleasantries or preamble.
-
-Respond with ONLY valid JSON. No markdown, no explanation outside the JSON."""
+Be precise and constructive. Feedback must be 1 to 2 sentences maximum."""
 
 
 class HandAgent(BaseSignAgent):
     """Evaluates hand shape and finger configuration for a given ASL sign."""
 
     def __init__(self, llm: BaseChatModel) -> None:
-        """Initialize the HandAgent.
+        """Initialize the HandAgent with a structured-output LLM.
 
         Args:
             llm: A shared multimodal LangChain chat model.
@@ -53,37 +44,15 @@ class HandAgent(BaseSignAgent):
         Returns:
             ChannelFeedback with correct flag and actionable feedback.
         """
-        user_content = [
-            {
-                "type": "text",
-                "text": f"Reference hand shape: {reference}\n\nEvaluate the hand shape in this image.",
-            },
-            ImageProcessor.to_inline_data(image_base64),
-        ]
-
         messages = [
             SystemMessage(content=_SYSTEM_PROMPT),
-            HumanMessage(content=user_content),
+            HumanMessage(content=[
+                {
+                    "type": "text",
+                    "text": f"Reference hand shape: {reference}\n\nEvaluate the hand shape in this image.",
+                },
+                ImageProcessor.to_inline_data(image_base64),
+            ]),
         ]
 
-        response = await self._llm.ainvoke(messages)
-        return _parse_channel_feedback(response.content)
-
-
-def _parse_channel_feedback(raw: str) -> ChannelFeedback:
-    """Parse the model's JSON response into a ChannelFeedback object.
-
-    Strips markdown code fences if present before parsing.
-
-    Args:
-        raw: Raw string response from the LLM.
-
-    Returns:
-        Parsed ChannelFeedback.
-
-    Raises:
-        ValueError: If the response cannot be parsed as valid JSON.
-    """
-    cleaned = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-    data = json.loads(cleaned)
-    return ChannelFeedback(correct=bool(data["correct"]), feedback=str(data["feedback"]))
+        return await self._structured_llm.ainvoke(messages)

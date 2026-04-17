@@ -5,8 +5,6 @@ Ignores hand shape and facial expression — those are handled by
 HandAgent and FaceAgent respectively.
 """
 
-import json
-
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 
@@ -27,19 +25,14 @@ Focus exclusively on:
   - Arm height and placement relative to the body
   - Overall body alignment appropriate for the sign
 
-Given an image of someone attempting an ASL sign and the reference description of
-the correct body posture, return a JSON object with exactly:
-  - "correct": boolean — true if posture matches the reference, false otherwise
-  - "feedback": string — 1 to 2 sentences, specific and actionable about posture
-
-Respond with ONLY valid JSON. No markdown, no explanation outside the JSON."""
+Feedback must be 1 to 2 sentences, specific and actionable about posture."""
 
 
 class BodyAgent(BaseSignAgent):
     """Evaluates upper body posture and arm positioning for ASL signing."""
 
     def __init__(self, llm: BaseChatModel) -> None:
-        """Initialize the BodyAgent.
+        """Initialize the BodyAgent with a structured-output LLM.
 
         Args:
             llm: A shared multimodal LangChain chat model.
@@ -56,35 +49,18 @@ class BodyAgent(BaseSignAgent):
         Returns:
             ChannelFeedback with correct flag and posture-specific feedback.
         """
-        user_content = [
-            {
-                "type": "text",
-                "text": (
-                    f"Reference body posture: {reference}\n\n"
-                    "Evaluate the body posture and upper body positioning in this image."
-                ),
-            },
-            ImageProcessor.to_inline_data(image_base64),
-        ]
-
         messages = [
             SystemMessage(content=_SYSTEM_PROMPT),
-            HumanMessage(content=user_content),
+            HumanMessage(content=[
+                {
+                    "type": "text",
+                    "text": (
+                        f"Reference body posture: {reference}\n\n"
+                        "Evaluate the body posture and upper body positioning in this image."
+                    ),
+                },
+                ImageProcessor.to_inline_data(image_base64),
+            ]),
         ]
 
-        response = await self._llm.ainvoke(messages)
-        return _parse_channel_feedback(response.content)
-
-
-def _parse_channel_feedback(raw: str) -> ChannelFeedback:
-    """Parse the model's JSON response into a ChannelFeedback object.
-
-    Args:
-        raw: Raw string response from the LLM.
-
-    Returns:
-        Parsed ChannelFeedback.
-    """
-    cleaned = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-    data = json.loads(cleaned)
-    return ChannelFeedback(correct=bool(data["correct"]), feedback=str(data["feedback"]))
+        return await self._structured_llm.ainvoke(messages)

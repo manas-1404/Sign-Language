@@ -8,6 +8,7 @@ share the same LLM client instance provided by the Orchestrator.
 from abc import ABC, abstractmethod
 
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.runnables import Runnable
 
 from backend.models.schemas import ChannelFeedback
 
@@ -15,17 +16,18 @@ from backend.models.schemas import ChannelFeedback
 class BaseSignAgent(ABC):
     """Abstract base for hand, face, and body evaluation agents.
 
-    Subclasses must implement the `analyze` method with a focused
-    system prompt scoped to their specific evaluation channel.
+    Wraps the shared LLM with with_structured_output(ChannelFeedback) so the
+    Gemini API enforces the response schema natively — no parsing needed.
+    Subclasses must implement the `analyze` method.
     """
 
     def __init__(self, llm: BaseChatModel) -> None:
-        """Initialize the agent with a shared LLM client.
+        """Initialize the agent and bind structured output to the ChannelFeedback schema.
 
         Args:
             llm: A LangChain chat model capable of multimodal input.
         """
-        self._llm = llm
+        self._structured_llm: Runnable = llm.with_structured_output(ChannelFeedback)
 
     @abstractmethod
     async def analyze(self, image_base64: str, reference: str) -> ChannelFeedback:

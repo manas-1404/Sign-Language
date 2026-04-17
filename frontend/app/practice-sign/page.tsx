@@ -26,6 +26,7 @@ export default function PracticeSignPage() {
   const { currentSign, currentIndex, totalSigns, isComplete, nextSign, resetLesson } =
     useLessonState();
 
+  const [isCameraOn, setIsCameraOn] = useState<boolean>(false);
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>("idle");
   const [feedback, setFeedback] = useState<FeedbackResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -55,6 +56,18 @@ export default function PracticeSignPage() {
     setErrorMessage(null);
   }, []);
 
+  const handleToggleCamera = useCallback((): void => {
+    setIsCameraOn((prev) => {
+      // Turning off mid-capture resets the flow back to idle.
+      if (prev) {
+        setAnalysisStatus("idle");
+        setFeedback(null);
+        setErrorMessage(null);
+      }
+      return !prev;
+    });
+  }, []);
+
   const handleRetry = useCallback((): void => {
     setAnalysisStatus("idle");
     setFeedback(null);
@@ -81,10 +94,16 @@ export default function PracticeSignPage() {
 
         <SignPrompt sign={currentSign} signIndex={currentIndex} totalSigns={totalSigns} />
 
-        <WebcamCapture onCapture={handleCapture} isCapturing={isCapturing} />
+        <WebcamCapture
+          isCameraOn={isCameraOn}
+          onToggleCamera={handleToggleCamera}
+          onCapture={handleCapture}
+          isCapturing={isCapturing}
+        />
 
         <ActionBar
           status={analysisStatus}
+          isCameraOn={isCameraOn}
           onStartCapture={handleStartCapture}
           onRetry={handleRetry}
           onNext={handleNext}
@@ -100,12 +119,24 @@ export default function PracticeSignPage() {
 
 interface ActionBarProps {
   status: AnalysisStatus;
+  isCameraOn: boolean;
   onStartCapture: () => void;
   onRetry: () => void;
   onNext: () => void;
 }
 
-const ActionBar = ({ status, onStartCapture, onRetry, onNext }: ActionBarProps) => {
+const ActionBar = ({ status, isCameraOn, onStartCapture, onRetry, onNext }: ActionBarProps) => {
+  if (!isCameraOn) {
+    return (
+      <button
+        disabled
+        className="w-full py-4 rounded-2xl bg-slate-800 font-semibold text-lg text-slate-500 cursor-not-allowed border border-slate-700"
+      >
+        Turn on camera to start
+      </button>
+    );
+  }
+
   if (status === "idle" || status === "error") {
     return (
       <button
