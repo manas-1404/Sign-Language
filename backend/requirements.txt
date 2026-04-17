@@ -1,0 +1,7 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+python-dotenv==1.1.0
+pydantic==2.11.3
+langchain-core==0.3.55
+langchain-google-genai==2.1.4
+python-multipart==0.0.20

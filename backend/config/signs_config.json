@@ -1,0 +1,62 @@
+{
+  "1": {
+    "name": "hello",
+    "hand": "Open hand with fingers together, palm facing outward. Fingertips touch the forehead or temple and the hand moves outward and slightly downward away from the head in a saluting gesture.",
+    "face": "Neutral or pleasant expression. Eyebrows in a relaxed, neutral position. Slight smile is natural and acceptable.",
+    "body": "Torso upright and facing forward. Dominant arm raised with elbow bent, hand at head height. Shoulder relaxed."
+  },
+  "2": {
+    "name": "thank you",
+    "hand": "Open flat hand with fingers together, palm facing inward toward the signer. Fingertips touch the chin or lips and the hand moves outward and slightly downward away from the face.",
+    "face": "Warm, grateful expression. Eyebrows relaxed or slightly raised. Slight smile or neutral mouth position.",
+    "body": "Torso upright. Dominant arm extends forward from chin level. Movement is smooth and deliberate, not rushed."
+  },
+  "3": {
+    "name": "yes",
+    "hand": "Dominant hand forms a fist with the index finger extended (or full fist). The hand nods up and down at the wrist, mimicking a head nodding yes.",
+    "face": "Affirmative expression. Eyebrows may be slightly raised for emphasis. Mouth closed or in a slight smile.",
+    "body": "Torso upright or with a very slight forward lean. Head may nod slightly in coordination with the hand movement."
+  },
+  "4": {
+    "name": "no",
+    "hand": "Dominant hand with index and middle fingers extended (or index finger only). The hand shakes side to side at the wrist, mimicking a head shaking no.",
+    "face": "Negative or neutral expression. Eyebrows may be furrowed slightly. Lips may press together.",
+    "body": "Torso upright. Head may shake slightly in coordination with the hand movement. Shoulders relaxed."
+  },
+  "5": {
+    "name": "please",
+    "hand": "Open flat hand placed on the chest with palm facing inward. Hand makes a circular rubbing motion on the chest in a clockwise direction.",
+    "face": "Polite, earnest expression. Eyebrows in a neutral or slightly raised position. Mouth relaxed or in a slight smile.",
+    "body": "Torso upright and facing forward. Dominant arm bent with hand on chest. Posture should convey sincerity."
+  },
+  "6": {
+    "name": "sorry",
+    "hand": "Dominant hand forms a fist. The fist is placed on the chest and makes a circular rubbing motion, similar to please but with a closed fist instead of open palm.",
+    "face": "Apologetic or remorseful expression. Eyebrows slightly furrowed or raised in concern. Lips may press together or mouth corners turn slightly down.",
+    "body": "Torso may have a very slight forward lean to convey sincerity. Head may tilt slightly downward. Shoulders relaxed."
+  },
+  "7": {
+    "name": "water",
+    "hand": "Dominant hand forms the letter W (three middle fingers extended, index and pinky bent). The index finger side of the hand taps against the chin twice.",
+    "face": "Neutral expression. Eyebrows in a relaxed position. Mouth may open slightly as if about to drink.",
+    "body": "Torso upright and facing forward. Dominant arm bent with hand at chin height. Movement is small and tapping, not sweeping."
+  },
+  "8": {
+    "name": "help",
+    "hand": "Dominant fist placed on top of the open non-dominant palm (thumbs-up fist on flat palm). Both hands move upward together from waist or chest height.",
+    "face": "Expression should be neutral or slightly concerned. Eyebrows in a neutral position for a statement. If asking for help as a question, eyebrows must be raised.",
+    "body": "Torso upright and facing forward. Slight forward lean is acceptable. Arms extended in front of the body at chest height, both hands visible."
+  },
+  "9": {
+    "name": "name",
+    "hand": "Both hands form the letter H (index and middle fingers extended horizontally). The dominant H-hand taps down onto the non-dominant H-hand twice in a crossing motion.",
+    "face": "Neutral or curious expression. Eyebrows relaxed. Mouth closed.",
+    "body": "Torso upright. Both arms extended in front of the body at chest or waist height. Movement is small and tapping downward."
+  },
+  "10": {
+    "name": "are you hungry?",
+    "hand": "Dominant hand forms the letter C (curved fingers and thumb forming a C shape). The C-hand moves downward along the chest from throat to stomach, tracing the esophagus.",
+    "face": "CRITICAL: Eyebrows MUST be raised for this yes/no question. This is grammatically required in ASL — raised eyebrows signal a yes/no question. Mouth may be slightly open. Head may tilt slightly forward.",
+    "body": "Torso upright or with a slight forward lean toward the conversation partner, which is natural when asking a question. Dominant arm bent with hand at upper chest/throat level."
+  }
+}
