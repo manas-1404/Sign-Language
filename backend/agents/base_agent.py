@@ -30,11 +30,11 @@ class BaseSignAgent(ABC):
         self._structured_llm: Runnable = llm.with_structured_output(ChannelFeedback)
 
     @abstractmethod
-    async def analyze(self, image_base64: str, reference: str) -> ChannelFeedback:
-        """Evaluate a single channel from the captured webcam frame.
+    async def analyze(self, frames: list[str], reference: str) -> ChannelFeedback:
+        """Evaluate a single channel across the captured video frames.
 
         Args:
-            image_base64: Base64-encoded JPEG image from the webcam.
+            frames: Ordered list of base64-encoded JPEG frames (earliest first).
             reference: Ground truth description for this channel from signs_config.json.
 
         Returns:

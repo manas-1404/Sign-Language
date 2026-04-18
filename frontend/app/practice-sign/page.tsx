@@ -32,13 +32,13 @@ export default function PracticeSignPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleCapture = useCallback(
-    async (imageBase64: string): Promise<void> => {
+    async (frames: string[]): Promise<void> => {
       setAnalysisStatus("analyzing");
       setFeedback(null);
       setErrorMessage(null);
 
       try {
-        const result = await analyzeSign(currentSign.id, imageBase64);
+        const result = await analyzeSign(currentSign.id, frames);
         setFeedback(result);
         setAnalysisStatus("done");
       } catch (err) {
@@ -143,7 +143,7 @@ const ActionBar = ({ status, isCameraOn, onStartCapture, onRetry, onNext }: Acti
         onClick={onStartCapture}
         className="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 font-semibold text-lg transition-colors"
       >
-        {status === "error" ? "Try Again" : "Start Capture (3s countdown)"}
+        {status === "error" ? "Try Again" : "Start Recording"}
       </button>
     );
   }
@@ -154,7 +154,7 @@ const ActionBar = ({ status, isCameraOn, onStartCapture, onRetry, onNext }: Acti
         disabled
         className="w-full py-4 rounded-2xl bg-indigo-800/50 font-semibold text-lg text-slate-400 cursor-not-allowed"
       >
-        {status === "capturing" ? "Get ready…" : "Analyzing…"}
+        {status === "capturing" ? "Recording in progress…" : "Analyzing…"}
       </button>
     );
   }

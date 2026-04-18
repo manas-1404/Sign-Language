@@ -10,22 +10,22 @@ import type { FeedbackResponse } from "@/types";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
 interface SignRequestBody {
-  image_base64: string;
+  frames: string[];
 }
 
 /**
- * Send a webcam frame to the backend for analysis and return structured feedback.
+ * Send an ordered sequence of webcam frames to the backend for analysis.
  *
  * @param signId - Numeric sign identifier (1–10), must match signs_config.json
- * @param imageBase64 - Base64-encoded JPEG image captured from the webcam
+ * @param frames - Ordered base64-encoded JPEG frames, earliest first
  * @returns Structured feedback for hand, face, and body channels
  * @throws Error if the request fails or the response is not OK
  */
 export const analyzeSign = async (
   signId: number,
-  imageBase64: string,
+  frames: string[],
 ): Promise<FeedbackResponse> => {
-  const body: SignRequestBody = { image_base64: imageBase64 };
+  const body: SignRequestBody = { frames };
 
   const response = await fetch(`${API_BASE_URL}/analyze/${signId}`, {
     method: "POST",

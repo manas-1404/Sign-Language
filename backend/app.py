@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.config.settings import ApiConfig
 from backend.models.schemas import FeedbackResponse, SignRequest
 from backend.agents.orchestrator import SignAnalysisOrchestrator
 from backend.utils.debug_image_writer import DebugImageWriter
@@ -53,27 +54,30 @@ async def health_check() -> dict:
 
 @app.post("/analyze/{sign_id}", response_model=FeedbackResponse)
 async def analyze_sign(sign_id: int, request: SignRequest) -> FeedbackResponse:
-    """Analyze a webcam frame for the specified ASL sign.
+    """Analyze a sequence of webcam frames for the specified ASL sign.
 
     Runs hand shape, facial expression, and body posture evaluation
-    concurrently and returns structured feedback for all three channels.
+    concurrently across all frames and returns structured feedback.
 
     Args:
         sign_id: Numeric sign identifier (1–10).
-        request: Request body containing the base64-encoded JPEG image.
+        request: Request body containing the ordered list of base64 JPEG frames.
 
     Returns:
         FeedbackResponse with correct/feedback for hand, face, and body.
     """
-    if sign_id < 1 or sign_id > 10:
-        raise HTTPException(status_code=400, detail="sign_id must be between 1 and 10")
+    if sign_id < ApiConfig.MIN_SIGN_ID or sign_id > ApiConfig.MAX_SIGN_ID:
+        raise HTTPException(
+            status_code=400,
+            detail=f"sign_id must be between {ApiConfig.MIN_SIGN_ID} and {ApiConfig.MAX_SIGN_ID}",
+        )
 
-    DebugImageWriter.save(sign_id, request.image_base64)
+    DebugImageWriter.save_frames(sign_id, request.frames)
 
     orchestrator = SignAnalysisOrchestrator()
 
     try:
-        return await orchestrator.analyze(sign_id, request.image_base64)
+        return await orchestrator.analyze(sign_id, request.frames)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:

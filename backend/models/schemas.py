@@ -6,11 +6,23 @@ The frontend TypeScript types must exactly mirror this structure.
 
 from pydantic import BaseModel, Field
 
+from backend.config.settings import VideoConfig
+
 
 class SignRequest(BaseModel):
-    """Request body containing the base64-encoded webcam frame."""
+    """Request body containing the ordered sequence of base64-encoded webcam frames.
 
-    image_base64: str = Field(..., description="Base64-encoded JPEG image from the webcam")
+    Frames must be in chronological order (frame 0 = earliest).
+    The expected count is defined by VideoConfig.FRAME_COUNT, but the backend
+    accepts any non-empty list to allow flexibility during development.
+    """
+
+    frames: list[str] = Field(
+        ...,
+        min_length=1,
+        max_length=VideoConfig.FRAME_COUNT * 2,
+        description="Ordered list of base64-encoded JPEG frames, earliest first",
+    )
 
 
 class ChannelFeedback(BaseModel):

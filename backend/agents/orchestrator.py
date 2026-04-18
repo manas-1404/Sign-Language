@@ -36,12 +36,12 @@ class SignAnalysisOrchestrator:
         self._face_agent = FaceAgent(llm)
         self._body_agent = BodyAgent(llm)
 
-    async def analyze(self, sign_id: int, image_base64: str) -> FeedbackResponse:
+    async def analyze(self, sign_id: int, frames: list[str]) -> FeedbackResponse:
         """Run all three channel analyses concurrently and return aggregated feedback.
 
         Args:
             sign_id: Numeric sign identifier (1–10), must exist in signs_config.json.
-            image_base64: Base64-encoded JPEG from the webcam.
+            frames: Ordered list of base64-encoded JPEG frames (earliest first).
 
         Returns:
             FeedbackResponse with hand, face, and body ChannelFeedback.
@@ -52,9 +52,9 @@ class SignAnalysisOrchestrator:
         reference = self._load_reference(sign_id)
 
         hand_result, face_result, body_result = await asyncio.gather(
-            self._hand_agent.analyze(image_base64, reference["hand"]),
-            self._face_agent.analyze(image_base64, reference["face"]),
-            self._body_agent.analyze(image_base64, reference["body"]),
+            self._hand_agent.analyze(frames, reference["hand"]),
+            self._face_agent.analyze(frames, reference["face"]),
+            self._body_agent.analyze(frames, reference["body"]),
         )
 
         return FeedbackResponse(hand=hand_result, face=face_result, body=body_result)

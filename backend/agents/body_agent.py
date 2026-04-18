@@ -39,28 +39,43 @@ class BodyAgent(BaseSignAgent):
         """
         super().__init__(llm)
 
-    async def analyze(self, image_base64: str, reference: str) -> ChannelFeedback:
-        """Evaluate body posture in the captured frame.
+    async def analyze(self, frames: list[str], reference: str) -> ChannelFeedback:
+        """Evaluate body posture across the recorded video frames.
 
         Args:
-            image_base64: Base64-encoded JPEG image from the webcam.
+            frames: Ordered list of base64-encoded JPEG frames (earliest first).
             reference: Correct body posture description from signs_config.json.
 
         Returns:
             ChannelFeedback with correct flag and posture-specific feedback.
         """
+        frame_images = [ImageProcessor.to_inline_data(f) for f in frames]
+        frame_labels = "".join(
+            f"\n[Frame {i + 1} of {len(frames)}]" for i in range(len(frames))
+        )
+
+        content: list = [
+            {
+                "type": "text",
+                "text": (
+                    f"Reference body posture: {reference}\n\n"
+                    f"You are given {len(frames)} frames from a short video recording "
+                    f"in chronological order (Frame 1 = earliest, Frame {len(frames)} = latest). "
+                    "Each frame is labeled below. Evaluate whether the upper body posture and "
+                    "arm positioning across these frames matches the reference. "
+                    "Consider the full motion arc."
+                    f"{frame_labels}"
+                ),
+            }
+        ]
+
+        for i, frame_image in enumerate(frame_images):
+            content.append({"type": "text", "text": f"Frame {i + 1}:"})
+            content.append(frame_image)
+
         messages = [
             SystemMessage(content=_SYSTEM_PROMPT),
-            HumanMessage(content=[
-                {
-                    "type": "text",
-                    "text": (
-                        f"Reference body posture: {reference}\n\n"
-                        "Evaluate the body posture and upper body positioning in this image."
-                    ),
-                },
-                ImageProcessor.to_inline_data(image_base64),
-            ]),
+            HumanMessage(content=content),
         ]
 
         return await self._structured_llm.ainvoke(messages)

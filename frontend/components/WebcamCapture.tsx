@@ -1,15 +1,14 @@
 "use client";
 
 /**
- * WebcamCapture — live webcam preview with countdown, capture flash, and
- * optional background replacement.
+ * WebcamCapture — live webcam preview with two-phase capture flow.
  *
  * Responsibilities:
  *   - Start/stop the camera based on isCameraOn prop
  *   - Optionally composite person over a neutral background via MediaPipe
- *   - Count down 3→2→1 when isCapturing is true, then take the photo
- *   - Show a "photo taken" flash so the user knows they can relax
- *   - Emit the composited (or raw) base64 JPEG via onCapture
+ *   - When isCapturing becomes true, run a 3-second pre-countdown ("get ready")
+ *     followed by interval-based frame sampling (FRAME_COUNT frames, FRAME_INTERVAL_MS apart)
+ *   - Emit the ordered base64 JPEG frame array via onCapture when done
  *
  * Does NOT call the API. Does NOT manage lesson state.
  */
@@ -17,26 +16,29 @@
 import { useEffect, useRef, useState } from "react";
 import { useWebcam } from "@/hooks/useWebcam";
 import { useBackgroundReplacement } from "@/hooks/useBackgroundReplacement";
+import { VIDEO_CONFIG } from "@/constants/config";
 
 interface WebcamCaptureProps {
   isCameraOn: boolean;
   onToggleCamera: () => void;
-  onCapture: (imageBase64: string) => void;
+  onCapture: (frames: string[]) => void;
   isCapturing: boolean;
 }
 
-const COUNTDOWN_SECONDS = 3;
+const PRE_COUNTDOWN_SECONDS = 3;
+type CapturePhase = "idle" | "pre-countdown" | "recording";
 
 const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: WebcamCaptureProps) => {
   const { videoRef, permissionStatus, startCamera, stopCamera, captureFrame: captureRaw } = useWebcam();
   const [bgEnabled, setBgEnabled] = useState(false);
+  const [capturePhase, setCapturePhase] = useState<CapturePhase>("idle");
   const [countdown, setCountdown] = useState<number | null>(null);
-  const [photoTaken, setPhotoTaken] = useState(false);
+  const [recordingProgress, setRecordingProgress] = useState(0);
+  const [recordingDone, setRecordingDone] = useState(false);
 
   const { canvasRef, isModelLoading, captureFrame: captureComposited } =
     useBackgroundReplacement(videoRef, bgEnabled && isCameraOn);
 
-  // Active capture function: composited canvas when bg is on, raw video when off.
   const activeCaptureRef = useRef(captureRaw);
   useEffect(() => {
     activeCaptureRef.current = bgEnabled && !isModelLoading ? captureComposited : captureRaw;
@@ -45,61 +47,93 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
   const onCaptureRef = useRef(onCapture);
   useEffect(() => { onCaptureRef.current = onCapture; }, [onCapture]);
 
-  // Start or stop the camera stream based on isCameraOn.
+  const recordIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   useEffect(() => {
     if (isCameraOn) {
       startCamera();
     } else {
       stopCamera();
+      setCapturePhase("idle");
       setCountdown(null);
-      setPhotoTaken(false);
+      setRecordingProgress(0);
+      setRecordingDone(false);
     }
   }, [isCameraOn, startCamera, stopCamera]);
 
   useEffect(() => () => stopCamera(), [stopCamera]);
 
-  // Single effect owns the full countdown → capture → flash sequence.
+  // Owns the full two-phase capture sequence: pre-countdown → recording.
   useEffect(() => {
     if (!isCapturing) {
+      if (recordIntervalRef.current) {
+        clearInterval(recordIntervalRef.current);
+        recordIntervalRef.current = null;
+      }
+      setCapturePhase("idle");
       setCountdown(null);
-      setPhotoTaken(false);
+      setRecordingProgress(0);
+      setRecordingDone(false);
       return;
     }
 
-    let count = COUNTDOWN_SECONDS;
+    // Phase 1: pre-countdown 3 → 2 → 1
+    let count = PRE_COUNTDOWN_SECONDS;
+    setCapturePhase("pre-countdown");
     setCountdown(count);
-    setPhotoTaken(false);
+    setRecordingDone(false);
 
-    const tick = setInterval(() => {
+    const countdownTick = setInterval(() => {
       count -= 1;
       if (count > 0) { setCountdown(count); return; }
 
-      clearInterval(tick);
+      clearInterval(countdownTick);
       setCountdown(null);
 
-      const frame = activeCaptureRef.current();
-      if (frame) {
-        setPhotoTaken(true);
-        onCaptureRef.current(frame);
-      }
+      // Phase 2: interval-based frame capture
+      setCapturePhase("recording");
+      const frames: string[] = [];
+      let frameIndex = 0;
+
+      const captureNext = () => {
+        const frame = activeCaptureRef.current();
+        if (frame) frames.push(frame);
+        frameIndex++;
+        setRecordingProgress(frameIndex);
+
+        if (frameIndex >= VIDEO_CONFIG.FRAME_COUNT) {
+          clearInterval(recordIntervalRef.current!);
+          recordIntervalRef.current = null;
+          setRecordingDone(true);
+          onCaptureRef.current(frames);
+        }
+      };
+
+      captureNext(); // capture frame 0 immediately when recording starts
+      recordIntervalRef.current = setInterval(captureNext, VIDEO_CONFIG.FRAME_INTERVAL_MS);
     }, 1000);
 
-    return () => clearInterval(tick);
+    return () => {
+      clearInterval(countdownTick);
+      if (recordIntervalRef.current) {
+        clearInterval(recordIntervalRef.current);
+        recordIntervalRef.current = null;
+      }
+    };
   }, [isCapturing]);
 
-  // Auto-hide the "photo taken" flash after 2.5 seconds.
+  // Auto-clear the "done" flash after 2 seconds.
   useEffect(() => {
-    if (!photoTaken) return;
-    const timer = setTimeout(() => setPhotoTaken(false), 2500);
+    if (!recordingDone) return;
+    const timer = setTimeout(() => setRecordingDone(false), 2000);
     return () => clearTimeout(timer);
-  }, [photoTaken]);
+  }, [recordingDone]);
 
   return (
     <div className="flex flex-col gap-2 w-full max-w-md mx-auto">
       <div className="relative rounded-2xl overflow-hidden bg-slate-800 aspect-video shadow-2xl">
         {isCameraOn ? (
           <>
-            {/* Raw video — always rendered so captureRaw works; hidden when bg is on */}
             <video
               ref={videoRef}
               className={[
@@ -110,7 +144,6 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
               playsInline
             />
 
-            {/* Composited canvas — shown only when background replacement is active */}
             {bgEnabled && (
               <canvas
                 ref={canvasRef}
@@ -124,8 +157,16 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
             {isModelLoading && <ModelLoadingOverlay />}
             {permissionStatus === "denied" && <PermissionDeniedOverlay />}
             {permissionStatus === "error" && <ErrorOverlay />}
-            {countdown !== null && <CountdownOverlay count={countdown} />}
-            {photoTaken && <PhotoTakenOverlay />}
+            {capturePhase === "pre-countdown" && countdown !== null && (
+              <PreCountdownOverlay count={countdown} />
+            )}
+            {capturePhase === "recording" && (
+              <RecordingOverlay
+                progress={recordingProgress}
+                total={VIDEO_CONFIG.FRAME_COUNT}
+              />
+            )}
+            {recordingDone && <RecordingDoneOverlay />}
           </>
         ) : (
           <CameraOffPlaceholder />
@@ -147,10 +188,10 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
 
 // ─── Overlays ────────────────────────────────────────────────────────────────
 
-const CountdownOverlay = ({ count }: { count: number }) => (
+const PreCountdownOverlay = ({ count }: { count: number }) => (
   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm gap-3">
     <p className="text-slate-300 text-sm font-medium uppercase tracking-widest">
-      Hold your sign…
+      Get ready to sign…
     </p>
     <span className="text-9xl font-black text-white drop-shadow-lg leading-none">
       {count}
@@ -158,11 +199,33 @@ const CountdownOverlay = ({ count }: { count: number }) => (
   </div>
 );
 
-const PhotoTakenOverlay = () => (
+interface RecordingOverlayProps {
+  progress: number;
+  total: number;
+}
+
+const RecordingOverlay = ({ progress, total }: RecordingOverlayProps) => (
+  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm gap-4">
+    <div className="flex items-center gap-2">
+      <span className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+      <p className="text-white font-semibold text-sm uppercase tracking-widest">Recording</p>
+    </div>
+    <div className="w-40 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+      <div
+        className="h-full bg-red-500 rounded-full transition-all duration-300"
+        style={{ width: `${(progress / total) * 100}%` }}
+      />
+    </div>
+    <p className="text-slate-400 text-xs">
+      Frame {progress} / {total}
+    </p>
+  </div>
+);
+
+const RecordingDoneOverlay = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center bg-emerald-500/20 backdrop-blur-sm gap-3 border-4 border-emerald-400/60 rounded-2xl">
-    <span className="text-5xl">📸</span>
-    <p className="text-emerald-300 font-bold text-lg">Photo taken!</p>
-    <p className="text-slate-300 text-sm">You can relax now — analyzing…</p>
+    <p className="text-emerald-300 font-bold text-lg">Recording complete!</p>
+    <p className="text-slate-300 text-sm">Analyzing your sign…</p>
   </div>
 );
 
@@ -186,7 +249,6 @@ const CameraOffPlaceholder = () => (
 
 const PermissionDeniedOverlay = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 gap-3 p-6 text-center">
-    <span className="text-4xl">🚫</span>
     <p className="text-white font-semibold">Camera access denied</p>
     <p className="text-slate-400 text-sm">
       Please allow camera access in your browser settings and refresh the page.
@@ -196,7 +258,6 @@ const PermissionDeniedOverlay = () => (
 
 const ErrorOverlay = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 gap-3 p-6 text-center">
-    <span className="text-4xl">⚠️</span>
     <p className="text-white font-semibold">Camera unavailable</p>
     <p className="text-slate-400 text-sm">No camera found or an error occurred.</p>
   </div>

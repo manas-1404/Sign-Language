@@ -1,12 +1,17 @@
 """Debug image persistence utility.
 
 Controlled by the SAVE_DEBUG_IMAGES environment variable.
-When enabled, saves every incoming webcam frame to disk so you can
-inspect what the model is actually seeing.
+When enabled, saves every incoming frame sequence to disk so you can
+inspect exactly what the model is seeing for each request.
 
 Usage:
     Set SAVE_DEBUG_IMAGES=true in your .env file.
-    Images are written to backend/debug_images/{sign_id}_{timestamp}.jpg
+    Each request creates a subdirectory:
+        backend/debug_images/sign{id}_{timestamp}/
+            frame_01.jpg
+            frame_02.jpg
+            ...
+            frame_06.jpg
 """
 
 import os
@@ -19,7 +24,10 @@ _OUTPUT_DIR = Path(__file__).parent.parent / "debug_images"
 
 
 class DebugImageWriter:
-    """Saves incoming frames to disk when SAVE_DEBUG_IMAGES is enabled.
+    """Saves incoming frame sequences to disk when SAVE_DEBUG_IMAGES is enabled.
+
+    Each call to save_frames() creates one subdirectory per request containing
+    one JPEG per frame, in the order they were sent to the agents.
 
     All methods are static — no state, no instantiation needed.
     """
@@ -37,30 +45,30 @@ class DebugImageWriter:
         return os.environ.get("SAVE_DEBUG_IMAGES", "false").strip().lower() in ("true", "1", "yes")
 
     @staticmethod
-    def save(sign_id: int, image_base64: str) -> Path | None:
-        """Save a base64-encoded image to disk if debug saving is enabled.
+    def save_frames(sign_id: int, frames: list[str]) -> Path | None:
+        """Save all frames from a single request to a dedicated subdirectory.
 
-        Creates the output directory if it does not exist.
-        Filename format: {sign_id}_{YYYYMMDD_HHMMSS_ffffff}.jpg
+        Directory name format: sign{id}_{YYYYMMDD_HHMMSS_ffffff}
+        File name format: frame_01.jpg, frame_02.jpg, …
 
         Args:
-            sign_id: The sign being practiced — included in the filename for filtering.
-            image_base64: Base64-encoded JPEG from the webcam request.
+            sign_id: The sign being practiced — included in the directory name.
+            frames: Ordered list of base64-encoded JPEG frames, earliest first.
 
         Returns:
-            The Path where the file was saved, or None if saving is disabled.
+            The Path of the created subdirectory, or None if saving is disabled.
         """
         if not DebugImageWriter.is_enabled():
             return None
 
-        _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-        filename = f"sign{sign_id}_{timestamp}.jpg"
-        output_path = _OUTPUT_DIR / filename
+        request_dir = _OUTPUT_DIR / f"sign{sign_id}_{timestamp}"
+        request_dir.mkdir(parents=True, exist_ok=True)
 
-        raw_bytes = ImageProcessor.decode_base64(image_base64)
-        output_path.write_bytes(raw_bytes)
+        for index, frame_base64 in enumerate(frames, start=1):
+            filename = f"frame_{index:02d}.jpg"
+            raw_bytes = ImageProcessor.decode_base64(frame_base64)
+            (request_dir / filename).write_bytes(raw_bytes)
 
-        print(f"[DebugImageWriter] Saved: {output_path}")
-        return output_path
+        print(f"[DebugImageWriter] Saved {len(frames)} frames → {request_dir}")
+        return request_dir
