@@ -24,12 +24,13 @@ interface WebcamCaptureProps {
   onCapture: (frames: string[]) => void;
   isCapturing: boolean;
   tierConfig: TierVideoSettings;
+  className?: string;
 }
 
 const PRE_COUNTDOWN_SECONDS = 3;
 type CapturePhase = "idle" | "pre-countdown" | "recording";
 
-const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing, tierConfig }: WebcamCaptureProps) => {
+const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing, tierConfig, className }: WebcamCaptureProps) => {
   const { videoRef, permissionStatus, startCamera, stopCamera, captureFrame: captureRaw } = useWebcam();
   const [bgEnabled, setBgEnabled] = useState(false);
   const [capturePhase, setCapturePhase] = useState<CapturePhase>("idle");
@@ -131,7 +132,7 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing, tie
   }, [recordingDone]);
 
   return (
-    <div className="flex flex-col gap-2 w-full max-w-md mx-auto">
+    <div className={`flex flex-col gap-2 w-full ${className ?? "max-w-md mx-auto"}`}>
       <div className="relative rounded-2xl overflow-hidden bg-slate-800 aspect-video shadow-2xl">
         {isCameraOn ? (
           <>

@@ -1,6 +1,7 @@
 /**
  * Ordered list of 10 ASL phrases for the Tier 2 lesson sequence.
  * IDs must match the numeric keys in backend/config/tier2_config.json.
+ * videoSlug maps to the filename in Vercel Blob under the tier-2/ prefix.
  */
 
 import type { PhraseMetadata } from "@/types";
@@ -8,63 +9,73 @@ import type { PhraseMetadata } from "@/types";
 export const TIER2_PHRASES: PhraseMetadata[] = [
   {
     id: 1,
-    phrase: "I want more water please",
-    aslOrder: "I WANT MORE WATER PLEASE",
-    description: "Sign all 5 signs in order. Keep expression neutral — this is a polite request, not a question.",
+    phrase: "Now I go",
+    aslOrder: "NOW I GO",
+    description: "Sign NOW → I → GO. Keep timing markers crisp — NOW grounds the phrase in the present.",
+    videoSlug: "now-i-go",
   },
   {
     id: 2,
-    phrase: "What is your name?",
-    aslOrder: "YOUR NAME WHAT",
-    description: "Sign YOUR → NAME → WHAT. Hold furrowed eyebrows throughout the entire phrase — WH-question grammar.",
+    phrase: "Free time, I want",
+    aslOrder: "FREE-TIME I WANT",
+    description: "Sign FREE-TIME → I → WANT. Pull WANT toward yourself to show desire.",
+    videoSlug: "free-time-i-want",
   },
   {
     id: 3,
-    phrase: "You are my good friend",
-    aslOrder: "YOU MY GOOD FRIEND",
-    description: "Sign YOU → MY → GOOD → FRIEND. Warm, affirmative expression throughout.",
+    phrase: "Now we play",
+    aslOrder: "NOW WE PLAY",
+    description: "Sign NOW → WE → PLAY. Keep PLAY loose and expressive — Y-hands shaking.",
+    videoSlug: "now-we-play",
   },
   {
     id: 4,
-    phrase: "I am hungry, I want food",
-    aslOrder: "I HUNGRY I WANT EAT",
-    description: "Sign I → HUNGRY → I → WANT → EAT. Let your expression show hunger during HUNGRY.",
+    phrase: "Later I will visit friend",
+    aslOrder: "LATER I VISIT FRIEND WILL",
+    description: "Sign LATER → I → VISIT → FRIEND → WILL. LATER sets future tense — body leans slightly forward.",
+    videoSlug: "later-i-visit-friend-will",
   },
   {
     id: 5,
-    phrase: "Where is my friend?",
-    aslOrder: "MY FRIEND WHERE",
-    description: "Sign MY → FRIEND → WHERE. Furrowed eyebrows must appear for WHERE — WH-question grammar.",
+    phrase: "Nice to meet you again",
+    aslOrder: "NICE MEET YOU AGAIN",
+    description: "Sign NICE → MEET → YOU → AGAIN. Warm expression throughout — this is a friendly greeting.",
+    videoSlug: "nice-meet-you-again",
   },
   {
     id: 6,
-    phrase: "I am sorry, thank you",
-    aslOrder: "SORRY THANK-YOU",
-    description: "Sign SORRY → THANK-YOU. Apologetic expression for SORRY, warm and grateful for THANK-YOU.",
+    phrase: "Now I listen",
+    aslOrder: "NOW I LISTEN",
+    description: "Sign NOW → I → LISTEN. Cup hand clearly behind ear for LISTEN.",
+    videoSlug: "now-i-listen",
   },
   {
     id: 7,
-    phrase: "I want to eat, please",
-    aslOrder: "I WANT EAT PLEASE",
-    description: "Sign I → WANT → EAT → PLEASE. Polite, earnest expression throughout.",
+    phrase: "Today they finished swimming",
+    aslOrder: "TODAY THEY SWIM FINISH",
+    description: "Sign TODAY → THEY → SWIM → FINISH. FINISH marks completion — flip both hands outward firmly.",
+    videoSlug: "today-they-swim-finish",
   },
   {
     id: 8,
-    phrase: "You are good, thank you",
-    aslOrder: "YOU GOOD THANK-YOU",
-    description: "Sign YOU → GOOD → THANK-YOU. Note: GOOD ends at your palm, THANK-YOU projects outward.",
+    phrase: "Later they will go to movies",
+    aslOrder: "LATER THEY GO MOVIES WILL",
+    description: "Sign LATER → THEY → GO → MOVIES → WILL. WILL reinforces future tense alongside LATER.",
+    videoSlug: "later-they-go-to-movies-will",
   },
   {
     id: 9,
-    phrase: "I am bad, I am sorry",
-    aslOrder: "I BAD SORRY",
-    description: "Sign I → BAD → SORRY. Let your face show genuine remorse — slight forward lean conveys humility.",
+    phrase: "Now I draw",
+    aslOrder: "NOW I DRAW",
+    description: "Sign NOW → I → DRAW. Trace the wavy DRAW motion clearly across your non-dominant palm.",
+    videoSlug: "now-i-draw",
   },
   {
     id: 10,
-    phrase: "Please help me, thank you",
-    aslOrder: "PLEASE HELP ME THANK-YOU",
-    description: "Sign PLEASE → HELP → ME → THANK-YOU. Both hands must lift upward for HELP.",
+    phrase: "Now I go to the café",
+    aslOrder: "NOW I GO CAFE",
+    description: "Sign NOW → I → GO → CAFE. Direction of GO should point toward an imagined café location.",
+    videoSlug: "now-i-go-to-cafe",
   },
 ];
 

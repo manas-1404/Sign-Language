@@ -24,22 +24,26 @@ export interface FeedbackResponse {
 export interface SignMetadata {
   /** Unique numeric ID matching the key in backend/config/tier1_config.json. */
   id: number;
-  /** Display name of the sign (e.g. "hungry"). */
+  /** Display name of the sign (e.g. "Now"). */
   name: string;
   /** Short description of what the sign means or how to perform it. */
   description: string;
+  /** Blob storage filename slug (e.g. "now" → tier-1/now.mp4). */
+  videoSlug: string;
 }
 
 /** Metadata for a multi-sign phrase in the tier 2 lesson sequence. */
 export interface PhraseMetadata {
   /** Unique numeric ID matching the key in backend/config/tier2_config.json. */
   id: number;
-  /** English phrase (e.g. "I want more water please"). */
+  /** English phrase (e.g. "Now I go"). */
   phrase: string;
-  /** ASL signing order (e.g. "I WANT MORE WATER PLEASE"). */
+  /** ASL signing order (e.g. "NOW I GO"). */
   aslOrder: string;
   /** Instruction shown to the user on how to perform the phrase. */
   description: string;
+  /** Blob storage filename slug (e.g. "now-i-go" → tier-2/now-i-go.mp4). */
+  videoSlug: string;
 }
 
 /** Possible states of the webcam permission flow. */
