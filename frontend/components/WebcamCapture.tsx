@@ -16,19 +16,20 @@
 import { useEffect, useRef, useState } from "react";
 import { useWebcam } from "@/hooks/useWebcam";
 import { useBackgroundReplacement } from "@/hooks/useBackgroundReplacement";
-import { VIDEO_CONFIG } from "@/constants/config";
+import type { TierVideoSettings } from "@/constants/config";
 
 interface WebcamCaptureProps {
   isCameraOn: boolean;
   onToggleCamera: () => void;
   onCapture: (frames: string[]) => void;
   isCapturing: boolean;
+  tierConfig: TierVideoSettings;
 }
 
 const PRE_COUNTDOWN_SECONDS = 3;
 type CapturePhase = "idle" | "pre-countdown" | "recording";
 
-const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: WebcamCaptureProps) => {
+const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing, tierConfig }: WebcamCaptureProps) => {
   const { videoRef, permissionStatus, startCamera, stopCamera, captureFrame: captureRaw } = useWebcam();
   const [bgEnabled, setBgEnabled] = useState(false);
   const [capturePhase, setCapturePhase] = useState<CapturePhase>("idle");
@@ -101,7 +102,7 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
         frameIndex++;
         setRecordingProgress(frameIndex);
 
-        if (frameIndex >= VIDEO_CONFIG.FRAME_COUNT) {
+        if (frameIndex >= tierConfig.frameCount) {
           clearInterval(recordIntervalRef.current!);
           recordIntervalRef.current = null;
           setRecordingDone(true);
@@ -110,7 +111,7 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
       };
 
       captureNext(); // capture frame 0 immediately when recording starts
-      recordIntervalRef.current = setInterval(captureNext, VIDEO_CONFIG.FRAME_INTERVAL_MS);
+      recordIntervalRef.current = setInterval(captureNext, tierConfig.frameIntervalMs);
     }, 1000);
 
     return () => {
@@ -163,7 +164,7 @@ const WebcamCapture = ({ isCameraOn, onToggleCamera, onCapture, isCapturing }: W
             {capturePhase === "recording" && (
               <RecordingOverlay
                 progress={recordingProgress}
-                total={VIDEO_CONFIG.FRAME_COUNT}
+                total={tierConfig.frameCount}
               />
             )}
             {recordingDone && <RecordingDoneOverlay />}

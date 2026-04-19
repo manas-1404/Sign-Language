@@ -16,18 +16,21 @@ interface SignRequestBody {
 /**
  * Send an ordered sequence of webcam frames to the backend for analysis.
  *
- * @param signId - Numeric sign identifier (1–10), must match signs_config.json
+ * @param tier - Learning tier (1 = individual signs, 2 = short phrases)
+ * @param contentId - Numeric ID of the sign or phrase within the tier
  * @param frames - Ordered base64-encoded JPEG frames, earliest first
  * @returns Structured feedback for hand, face, and body channels
  * @throws Error if the request fails or the response is not OK
  */
 export const analyzeSign = async (
-  signId: number,
+  tier: number,
+  contentId: number,
   frames: string[],
 ): Promise<FeedbackResponse> => {
   const body: SignRequestBody = { frames };
+  const url = `${API_BASE_URL}/analyze?tier=${tier}&content_id=${contentId}`;
 
-  const response = await fetch(`${API_BASE_URL}/analyze/${signId}`, {
+  const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

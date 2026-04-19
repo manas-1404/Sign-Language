@@ -1,66 +1,66 @@
 /**
- * Ordered list of 10 ASL signs for the lesson sequence.
- *
- * IDs must match the numeric keys in backend/config/signs_config.json.
- * Sign 10 ("are you hungry?") is intentionally included to demonstrate
- * the facial expression / non-manual marker channel, since it grammatically
- * requires raised eyebrows as a yes/no question marker in ASL.
+ * Ordered list of 11 ASL signs for the Tier 1 lesson sequence.
+ * IDs must match the numeric keys in backend/config/tier1_config.json.
  */
 
 import type { SignMetadata } from "@/types";
 
-export const SIGNS: SignMetadata[] = [
+export const TIER1_SIGNS: SignMetadata[] = [
   {
     id: 1,
-    name: "Hello",
-    description: "A saluting gesture from the forehead, like a friendly wave.",
+    name: "I / Me",
+    description: "Point your index finger at your own chest, or place your flat hand on it.",
   },
   {
     id: 2,
-    name: "Thank You",
-    description: "Flat hand from chin, moving outward — expressing gratitude.",
+    name: "You",
+    description: "Extend your index finger and point it directly toward the person you are addressing.",
   },
   {
     id: 3,
-    name: "Yes",
-    description: "A fist nodding up and down, like a head nodding yes.",
+    name: "Want",
+    description: "Both hands open with curved fingers, palms up — pull them inward toward your body.",
   },
   {
     id: 4,
-    name: "No",
-    description: "Index finger shaking side to side, like a head shaking no.",
+    name: "Eat",
+    description: "Bunch all fingertips to your thumb and tap toward your mouth 2 to 3 times.",
   },
   {
     id: 5,
-    name: "Please",
-    description: "Open palm rubbing a circle on the chest.",
+    name: "Good",
+    description: "Flat hand starts at chin, moves forward and down into your non-dominant open palm.",
   },
   {
     id: 6,
-    name: "Sorry",
-    description: "A closed fist rubbing a circle on the chest.",
+    name: "Bad",
+    description: "Flat hand starts palm-in at chin, then flips outward and downward to palm-down.",
   },
   {
     id: 7,
-    name: "Water",
-    description: "W-handshape tapping the chin twice.",
+    name: "Where",
+    description: "Index finger waggles side to side. Eyebrows must be furrowed — this is a WH-question.",
   },
   {
     id: 8,
-    name: "Help",
-    description: "A fist on an open palm, both hands lifting upward together.",
+    name: "What",
+    description: "Dominant index finger brushes down across your non-dominant open palm. Eyebrows furrowed.",
   },
   {
     id: 9,
-    name: "Name",
-    description: "Two H-hands crossing and tapping — like scissors touching.",
+    name: "More",
+    description: "Both hands in flat-O shape — tap fingertips together at chest level 2 to 3 times.",
   },
   {
     id: 10,
-    name: "Are You Hungry?",
-    description:
-      "C-hand moving down the chest. IMPORTANT: raised eyebrows are grammatically required for this yes/no question in ASL.",
+    name: "Friend",
+    description: "Hook both index fingers together, then swap which one is on top.",
+  },
+  {
+    id: 11,
+    name: "Hungry",
+    description: "C-shaped hand at upper chest, slides smoothly downward toward your stomach.",
   },
 ];
 
-export const TOTAL_SIGNS = SIGNS.length;
+export const TOTAL_TIER1_SIGNS = TIER1_SIGNS.length;

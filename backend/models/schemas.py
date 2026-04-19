@@ -6,21 +6,22 @@ The frontend TypeScript types must exactly mirror this structure.
 
 from pydantic import BaseModel, Field
 
-from backend.config.settings import VideoConfig
+from backend.config.settings import TierVideoConfig
+
+_MAX_FRAMES = max(cfg["frame_count"] for cfg in TierVideoConfig.SETTINGS.values()) * 2
 
 
 class SignRequest(BaseModel):
     """Request body containing the ordered sequence of base64-encoded webcam frames.
 
     Frames must be in chronological order (frame 0 = earliest).
-    The expected count is defined by VideoConfig.FRAME_COUNT, but the backend
-    accepts any non-empty list to allow flexibility during development.
+    Max length is capped at 2x the highest per-tier frame count to allow flexibility.
     """
 
     frames: list[str] = Field(
         ...,
         min_length=1,
-        max_length=VideoConfig.FRAME_COUNT * 2,
+        max_length=_MAX_FRAMES,
         description="Ordered list of base64-encoded JPEG frames, earliest first",
     )
 

@@ -20,13 +20,25 @@ export interface FeedbackResponse {
   body: ChannelFeedback;
 }
 
-/** Metadata for a single ASL sign in the lesson sequence. */
+/** Metadata for a single ASL sign in the tier 1 lesson sequence. */
 export interface SignMetadata {
-  /** Unique numeric ID matching the key in backend/config/signs_config.json. */
+  /** Unique numeric ID matching the key in backend/config/tier1_config.json. */
   id: number;
-  /** Display name of the sign (e.g. "hello"). */
+  /** Display name of the sign (e.g. "hungry"). */
   name: string;
   /** Short description of what the sign means or how to perform it. */
+  description: string;
+}
+
+/** Metadata for a multi-sign phrase in the tier 2 lesson sequence. */
+export interface PhraseMetadata {
+  /** Unique numeric ID matching the key in backend/config/tier2_config.json. */
+  id: number;
+  /** English phrase (e.g. "I want more water please"). */
+  phrase: string;
+  /** ASL signing order (e.g. "I WANT MORE WATER PLEASE"). */
+  aslOrder: string;
+  /** Instruction shown to the user on how to perform the phrase. */
   description: string;
 }
 

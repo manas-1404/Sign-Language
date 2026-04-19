@@ -1,0 +1,68 @@
+{
+  "1": {
+    "name": "I / Me",
+    "hand": "Dominant index finger points directly at the signer's own chest, or dominant flat hand is placed on the chest. Single clear, deliberate gesture at chest level.",
+    "face": "Neutral, natural expression. Eye contact maintained with the camera. No grammatical brow movement required.",
+    "body": "Upright torso, relaxed shoulders. Hand positioned at chest level. Arm movement is minimal and controlled."
+  },
+  "2": {
+    "name": "You",
+    "hand": "Dominant index finger extended and pointing directly forward toward the person being addressed. Arm extends comfortably outward at mid-chest height.",
+    "face": "Neutral expression with gaze directed forward toward the addressee. No special brow movement required for this statement form.",
+    "body": "Upright torso. Arm extends forward naturally. Shoulders relaxed and square to the front."
+  },
+  "3": {
+    "name": "Want",
+    "hand": "Both hands open with fingers slightly bent and curved like claws, palms facing up. Both hands pull inward toward the body simultaneously in a smooth scooping motion.",
+    "face": "Slightly wanting or desirous expression. Eyebrows may rise slightly to convey desire or emphasis. Mouth relaxed.",
+    "body": "Upright torso. Arms begin extended at chest height and move inward toward the torso. Both hands move symmetrically."
+  },
+  "4": {
+    "name": "Eat",
+    "hand": "Dominant hand forms a flat O shape — all fingertips touching the thumb — and is moved toward the mouth, tapping or touching near the lips 2 to 3 times.",
+    "face": "Mouth may open slightly in anticipation. Neutral to mildly anticipatory expression. No grammatical brow movement required.",
+    "body": "Upright torso. Elbow bent, forearm raised. Hand moves toward the mouth area at a natural pace."
+  },
+  "5": {
+    "name": "Good",
+    "hand": "Dominant flat hand with fingers together and palm facing left begins at chin level, then moves forward and downward to land in the upward-facing non-dominant flat palm held at chest level.",
+    "face": "Positive, pleasant expression. Slight smile acceptable. Eyebrows neutral to slightly raised to convey approval.",
+    "body": "Upright posture. Both hands visible — dominant moves from chin level downward while non-dominant remains stationary as the receiving hand."
+  },
+  "6": {
+    "name": "Bad",
+    "hand": "Dominant flat hand begins palm-in near the chin or mouth, then flips outward and downward ending with palm facing down, away from the body. The flip is a clear wrist rotation.",
+    "face": "Negative or disapproving expression. Eyebrows may furrow or lower. Lips may press together. Expression should convey disapproval.",
+    "body": "Upright torso. Movement occurs at chin level with the arm extending outward during the flip. Shoulders relaxed."
+  },
+  "7": {
+    "name": "Where",
+    "hand": "Dominant index finger extended, hand shakes or waggles side-to-side repeatedly — a small back-and-forth wrist motion, not a full arm sweep. Movement is quick and repeated.",
+    "face": "WH-question facial grammar is grammatically required: eyebrows must be furrowed and lowered throughout the sign. Head may tilt slightly forward or to the side.",
+    "body": "Upright. Slight forward lean acceptable. Shoulder may shrug slightly. Hand held at mid-chest to shoulder height."
+  },
+  "8": {
+    "name": "What",
+    "hand": "Non-dominant hand open with palm facing up at chest level. Dominant index finger brushes downward and inward across the non-dominant palm in a repeated motion. Alternatively, dominant index finger waggles side to side.",
+    "face": "WH-question facial grammar is grammatically required: eyebrows must be furrowed and lowered. Slight head tilt or forward lean. Lips may be slightly pursed.",
+    "body": "Upright, hands at chest or waist level. Relaxed shoulders. Slight forward lean consistent with asking a question."
+  },
+  "9": {
+    "name": "More",
+    "hand": "Both hands form flat O shapes — all fingertips pinched to the thumb on each hand. The fingertips of both hands tap together 2 to 3 times at mid-chest level.",
+    "face": "Emphatic or requesting expression. Eyebrows may raise slightly for emphasis. Neutral to mildly eager expression.",
+    "body": "Upright torso. Both hands come together at the midline of the body at chest height. Movement is clean and deliberate."
+  },
+  "10": {
+    "name": "Friend",
+    "hand": "Dominant index finger bent and hooked, locks over the non-dominant index finger which is also bent. The hands then reverse so the non-dominant hooks over the dominant. Both index fingers remain bent throughout the full motion.",
+    "face": "Warm, friendly expression. Slight smile. Eyebrows relaxed and natural. Expression should convey warmth.",
+    "body": "Upright. Hands held at chest level. Slight forward lean optional to convey friendliness."
+  },
+  "11": {
+    "name": "Hungry",
+    "hand": "Dominant hand forms a C-shape with fingers curved and palm facing inward. Hand is placed at the upper chest or throat area and slides smoothly downward toward the stomach in a single fluid motion.",
+    "face": "Hungry or wanting expression. Eyebrows may raise or furrow slightly. Mouth may open slightly. Expression should convey genuine hunger or desire.",
+    "body": "Upright torso. The C-hand traces down the center of the chest clearly. Movement is deliberate and visible from upper chest to lower torso."
+  }
+}

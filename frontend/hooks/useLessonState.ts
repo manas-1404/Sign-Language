@@ -1,50 +1,38 @@
 "use client";
 
 /**
- * useLessonState — manages all lesson progression logic.
+ * useLessonState — generic lesson progression hook.
  *
- * This is the single source of truth for which sign the user is currently
- * practicing, how far through the lesson they are, and whether it is complete.
- * No other component or hook manages lesson state.
+ * Tracks which item the user is currently on, provides nextItem() and
+ * resetLesson(), and signals when the lesson is complete.
+ * Works for any array of items — used by both Tier 1 (SignMetadata[])
+ * and Tier 2 (PhraseMetadata[]).
  */
 
 import { useState, useCallback } from "react";
-import { SIGNS, TOTAL_SIGNS } from "@/constants/signs";
-import type { SignMetadata } from "@/types";
 
-interface UseLessonStateReturn {
-  currentSign: SignMetadata;
+interface UseLessonStateReturn<T> {
+  currentItem: T;
   currentIndex: number;
-  totalSigns: number;
+  totalItems: number;
   isComplete: boolean;
-  nextSign: () => void;
+  nextItem: () => void;
   resetLesson: () => void;
 }
 
-export const useLessonState = (): UseLessonStateReturn => {
+export const useLessonState = <T>(items: T[]): UseLessonStateReturn<T> => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
-  // isComplete is true when the index reaches the end.
-  // currentSign is always clamped to the last valid entry so hooks that
-  // depend on currentSign.id never receive undefined — even after the
-  // lesson is complete and before the completion screen renders.
-  const isComplete = currentIndex >= TOTAL_SIGNS;
-  const currentSign = SIGNS[Math.min(currentIndex, TOTAL_SIGNS - 1)];
+  const isComplete = currentIndex >= items.length;
+  const currentItem = items[Math.min(currentIndex, items.length - 1)];
 
-  const nextSign = useCallback((): void => {
-    setCurrentIndex((prev) => Math.min(prev + 1, TOTAL_SIGNS));
-  }, []);
+  const nextItem = useCallback((): void => {
+    setCurrentIndex((prev) => Math.min(prev + 1, items.length));
+  }, [items.length]);
 
   const resetLesson = useCallback((): void => {
     setCurrentIndex(0);
   }, []);
 
-  return {
-    currentSign,
-    currentIndex,
-    totalSigns: TOTAL_SIGNS,
-    isComplete,
-    nextSign,
-    resetLesson,
-  };
+  return { currentItem, currentIndex, totalItems: items.length, isComplete, nextItem, resetLesson };
 };

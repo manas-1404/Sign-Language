@@ -1,0 +1,72 @@
+{
+  "1": {
+    "name": "I want more water please",
+    "asl_order": "I WANT MORE WATER PLEASE",
+    "hand": "Five distinct handshapes in sequence across the frames: index finger pointing to chest (I), both curved hands pulling toward body with palms up (WANT), both flat-O hands tapping together at midline (MORE), W-handshape tapping the chin 2 times (WATER), flat hand making a circular motion over the chest (PLEASE). Each handshape should be clearly formed before transitioning to the next.",
+    "face": "Neutral, affirmative expression sustained throughout the entire phrase. Eyebrows relaxed — this is a declarative statement, not a question. No WH-question or yes/no brow movement. Slight polite expression for PLEASE at the end is acceptable.",
+    "body": "Upright torso maintained across all five signs. Arms and hands shift smoothly between signs without unnecessary pausing. Hand heights vary naturally with each sign — chest for I and WANT, midline for MORE, chin for WATER, chest for PLEASE."
+  },
+  "2": {
+    "name": "What is your name",
+    "asl_order": "YOUR NAME WHAT",
+    "hand": "Three signs in sequence: dominant hand pointing forward toward the addressee (YOUR), both hands with bent or crossed index and middle fingers tapping together twice (NAME), then dominant index finger brushing downward across the non-dominant open palm or wagging side to side (WHAT). The NAME sign requires both hands with H or X handshape tapping clearly.",
+    "face": "WH-question facial grammar must be sustained across the entire phrase from start to finish: eyebrows furrowed and lowered throughout all three signs. Head may tilt slightly forward or to the side. This brow position is grammatically required in ASL for WH-questions and must not drop during any sign in the sequence.",
+    "body": "Upright or slight consistent forward lean throughout the entire question. Head tilt should be steady and consistent with WH-question grammar. Hands transition naturally from YOUR to NAME to WHAT."
+  },
+  "3": {
+    "name": "You are my good friend",
+    "asl_order": "YOU MY GOOD FRIEND",
+    "hand": "Four signs in sequence: index finger pointing forward (YOU), flat dominant hand placed on chest (MY), dominant flat hand moving from chin level forward and down to non-dominant open palm (GOOD), both index fingers hooked together alternating which hooks over which (FRIEND). All handshapes should be crisp and distinct.",
+    "face": "Warm, positive, affirmative expression sustained throughout. Slight smile acceptable and natural. Eyebrows relaxed and neutral — this is an affirmative compliment, not a question. Expression should convey genuine warmth especially for FRIEND.",
+    "body": "Upright, open body posture throughout. Slight forward lean acceptable to convey warmth. Arms transition smoothly between signs at natural chest height. Both hands are visible for GOOD and FRIEND."
+  },
+  "4": {
+    "name": "I am hungry I want food",
+    "asl_order": "I HUNGRY I WANT EAT",
+    "hand": "Five signs in sequence: index finger to chest (I), C-hand sliding down from upper chest to stomach (HUNGRY), index finger to chest again (I), both curved hands pulling toward body with palms up (WANT), flat-O or bunched hand tapping toward mouth (EAT). The I sign appears twice and should be consistent. The HUNGRY sign requires the C-hand to travel visibly down the torso.",
+    "face": "Emotional expression shifts naturally across the phrase: neutral for I, then hungry or wanting expression during HUNGRY — mouth may open slightly, brows raise or furrow to convey need — then earnest requesting expression for WANT and EAT. The facial expression should support the emotional content of the phrase.",
+    "body": "Upright torso throughout. HUNGRY requires the dominant hand to travel clearly down the center of the chest. The repeated I sign should return cleanly to the chest. Arms are at chest and mouth level for EAT. Body posture reflects the earnest nature of the statement."
+  },
+  "5": {
+    "name": "Where is my friend",
+    "asl_order": "MY FRIEND WHERE",
+    "hand": "Three signs in sequence: dominant flat hand on chest (MY), both index fingers hooked together alternating (FRIEND), then dominant index finger wagging side to side (WHERE). The transition from FRIEND to WHERE should be smooth — fingers separate from the hooked position to a single extended index finger.",
+    "face": "WH-question facial grammar must begin by the FRIEND sign and be fully present during WHERE: eyebrows furrowed and lowered, slight head tilt or lean forward. The furrowed brow is grammatically required in ASL for WHERE and should be clearly visible in the final frames.",
+    "body": "Upright torso with slight lean on WHERE. Slight shoulder shrug during WHERE is natural and acceptable. Hand positions shift from chest (MY) to chest midline (FRIEND) to a raised pointing position (WHERE)."
+  },
+  "6": {
+    "name": "I am sorry thank you",
+    "asl_order": "SORRY THANK-YOU",
+    "hand": "Two signs in sequence: dominant closed fist making a circular motion over the center of the chest (SORRY), then dominant flat hand starting at the chin or lips and moving forward and slightly downward away from the face (THANK-YOU). The transition from circular chest motion to the chin-forward motion should be distinct.",
+    "face": "Sincere, apologetic expression for SORRY — slight downcast gaze and soft brow position convey genuine remorse. Expression transitions to warm and grateful for THANK-YOU. Eyebrows relaxed throughout — no grammatical brow movement required.",
+    "body": "Upright with slight forward lean for THANK-YOU to convey sincerity. Shoulders relaxed. SORRY movement at chest level, THANK-YOU starts at chin and projects outward toward the viewer."
+  },
+  "7": {
+    "name": "I want to eat please",
+    "asl_order": "I WANT EAT PLEASE",
+    "hand": "Four signs in sequence: index finger pointing to chest (I), both curved hands pulling toward body with palms up (WANT), flat-O or bunched hand tapping toward mouth (EAT), flat hand making a circular motion over the chest (PLEASE). All four handshapes must be clearly formed and distinct from one another.",
+    "face": "Polite, earnest requesting expression throughout. Eyebrows may rise very slightly for PLEASE at the end to convey politeness. Neutral to pleasant expression sustained for I, WANT, and EAT. No WH-question or yes/no question brow movement required.",
+    "body": "Upright torso across all four signs. Hands move efficiently between sign positions: chest for I, pulled toward body for WANT, mouth level for EAT, chest level for PLEASE. No unnecessary pausing between signs."
+  },
+  "8": {
+    "name": "You are good thank you",
+    "asl_order": "YOU GOOD THANK-YOU",
+    "hand": "Three signs in sequence: dominant index finger pointing forward toward addressee (YOU), dominant flat hand moving from chin level forward to the non-dominant open palm (GOOD), dominant flat hand starting at chin or lips and moving forward and downward away from the face (THANK-YOU). Note that GOOD ends at the non-dominant palm while THANK-YOU projects outward — distinguish these two signs clearly.",
+    "face": "Positive, warm, appreciative expression sustained throughout the phrase. Slight smile natural and appropriate. Eyebrows relaxed and neutral — this is an affirmative compliment with gratitude, not a question.",
+    "body": "Upright, open posture. Slight forward lean for THANK-YOU to convey sincerity. Non-dominant hand held out as receiving hand for GOOD. Both hands visible during GOOD, dominant hand only during THANK-YOU."
+  },
+  "9": {
+    "name": "I am bad I am sorry",
+    "asl_order": "I BAD SORRY",
+    "hand": "Three signs in sequence: dominant index finger pointing to chest (I), dominant flat hand starting palm-in near the chin and flipping outward downward to palm-down away from the body (BAD), then dominant closed fist making a circular motion over the chest (SORRY). The BAD sign flip must be clear and complete.",
+    "face": "Contrite or remorseful expression throughout. Eyebrows may furrow or lower during BAD to convey negativity, then soften into a genuinely apologetic expression during SORRY. The emotional shift from self-acknowledgment of wrongdoing to apology should be visible in the face.",
+    "body": "Upright but with a slight forward lean to convey humility. Shoulders may drop slightly. BAD movement at chin level projecting outward. SORRY at chest level with circular motion. Body language should reflect the apologetic tone."
+  },
+  "10": {
+    "name": "Please help me thank you",
+    "asl_order": "PLEASE HELP ME THANK-YOU",
+    "hand": "Four signs in sequence: dominant flat hand making circular motion over chest (PLEASE), dominant fist placed on top of non-dominant open flat palm with both hands moving upward together (HELP), dominant index finger pointing at own chest (ME), dominant flat hand from chin moving forward and downward (THANK-YOU). The HELP sign requires both hands clearly visible and moving upward.",
+    "face": "Polite and sincere expression throughout. Eyebrows may raise slightly for PLEASE and THANK-YOU to convey politeness and gratitude. Earnest expression for HELP and ME. No WH-question brow movement required — this is a polite request.",
+    "body": "Upright. HELP requires both hands at chest level lifting upward clearly — both hands must be visible. ME returns to single-hand chest point. Slight forward lean for THANK-YOU. Overall posture conveys a respectful, earnest request."
+  }
+}
