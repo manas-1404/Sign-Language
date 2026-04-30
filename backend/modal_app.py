@@ -49,7 +49,7 @@ _backend_image = (
 
 
 @app.cls(
-    gpu="A10G",
+    gpu="L4",
     image=_backend_image,
     volumes={WEIGHTS_PATH: model_volume},
     secrets=[modal.Secret.from_name("sign-language-secrets")],
