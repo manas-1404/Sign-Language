@@ -53,8 +53,8 @@ _backend_image = (
     image=_backend_image,
     volumes={WEIGHTS_PATH: model_volume},
     secrets=[modal.Secret.from_name("sign-language-secrets")],
-    timeout=300,
-    scaledown_window=600,
+    timeout=150,
+    scaledown_window=240,
 )
 class SignLanguageService:
     """Modal deployment class serving the FastAPI backend with Gemma 4 on GPU.
