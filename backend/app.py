@@ -10,11 +10,12 @@ Environment:
     Copy .env.example to .env and fill in your GOOGLE_API_KEY.
 """
 
+import os
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config.settings import ApiConfig
@@ -23,6 +24,13 @@ from backend.agents.orchestrator import SignAnalysisOrchestrator
 from backend.utils.debug_image_writer import DebugImageWriter
 
 load_dotenv()
+
+
+def _require_api_secret(x_api_secret: str | None = Header(default=None, alias="X-Api-Secret")) -> None:
+    """FastAPI dependency that rejects requests missing the correct shared secret."""
+    expected = os.environ.get("MODAL_PROXY_API_SECRET")
+    if not expected or x_api_secret != expected:
+        raise HTTPException(status_code=403, detail="Forbidden")
 
 
 @asynccontextmanager
@@ -52,7 +60,7 @@ async def health_check() -> dict:
     return {"status": "ok"}
 
 
-@app.post("/analyze", response_model=FeedbackResponse)
+@app.post("/analyze", response_model=FeedbackResponse, dependencies=[Depends(_require_api_secret)])
 async def analyze_sign(
     tier: int = Query(..., ge=ApiConfig.MIN_TIER, le=ApiConfig.MAX_TIER, description="Learning tier (1 or 2)"),
     content_id: int = Query(..., ge=ApiConfig.MIN_CONTENT_ID, description="Sign or phrase ID within the tier"),

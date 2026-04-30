@@ -9,6 +9,7 @@ Deploy:
 
 Environment — Modal Secret named 'sign-language-secrets' must contain:
     INFERENCE_MODE=local
+    MODAL_PROXY_API_SECRET=<shared secret matching frontend MODAL_PROXY_API_SECRET>
 """
 
 import sys

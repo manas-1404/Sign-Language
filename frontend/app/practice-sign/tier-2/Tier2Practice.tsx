@@ -8,7 +8,9 @@
  */
 
 import { useState, useCallback } from "react";
+import Turnstile from "@marsidev/react-turnstile";
 import { useLessonState } from "@/hooks/useLessonState";
+import { useTurnstile } from "@/hooks/useTurnstile";
 import { analyzeSign } from "@/services/signApi";
 import WebcamCapture from "@/components/WebcamCapture";
 import FeedbackPanel from "@/components/FeedbackPanel";
@@ -29,6 +31,8 @@ export default function Tier2Practice({ videoUrls }: Tier2PracticeProps) {
   const { currentItem: currentPhrase, currentIndex, totalItems, isComplete, nextItem, resetLesson } =
     useLessonState(TIER2_PHRASES);
 
+  const { token: turnstileToken, widgetKey, onVerified, reset: resetTurnstile } = useTurnstile();
+
   const [isCameraOn, setIsCameraOn] = useState<boolean>(false);
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>("idle");
   const [feedback, setFeedback] = useState<FeedbackResponse | null>(null);
@@ -36,21 +40,24 @@ export default function Tier2Practice({ videoUrls }: Tier2PracticeProps) {
 
   const handleCapture = useCallback(
     async (frames: string[]): Promise<void> => {
+      if (!turnstileToken) return;
       setAnalysisStatus("analyzing");
       setFeedback(null);
       setErrorMessage(null);
 
       try {
-        const result = await analyzeSign(TIER, currentPhrase.id, frames);
+        const result = await analyzeSign(TIER, currentPhrase.id, frames, turnstileToken);
         setFeedback(result);
         setAnalysisStatus("done");
       } catch (err) {
         const message = err instanceof Error ? err.message : "Analysis failed. Please try again.";
         setErrorMessage(message);
         setAnalysisStatus("error");
+      } finally {
+        resetTurnstile();
       }
     },
-    [currentPhrase.id],
+    [currentPhrase.id, turnstileToken, resetTurnstile],
   );
 
   const handleStartCapture = useCallback((): void => {
@@ -120,9 +127,16 @@ export default function Tier2Practice({ videoUrls }: Tier2PracticeProps) {
             <ActionBar
               status={analysisStatus}
               isCameraOn={isCameraOn}
+              isVerified={!!turnstileToken}
               onStartCapture={handleStartCapture}
               onRetry={handleRetry}
               onNext={handleNext}
+            />
+            <Turnstile
+              key={widgetKey}
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+              onSuccess={onVerified}
+              options={{ size: "compact" }}
             />
             {analysisStatus === "analyzing" && <AnalyzingIndicator />}
             {analysisStatus === "error" && errorMessage && <ErrorBanner message={errorMessage} />}
@@ -181,12 +195,13 @@ const PhrasePrompt = ({ phrase, aslOrder, description, phraseIndex, totalPhrases
 interface ActionBarProps {
   status: AnalysisStatus;
   isCameraOn: boolean;
+  isVerified: boolean;
   onStartCapture: () => void;
   onRetry: () => void;
   onNext: () => void;
 }
 
-const ActionBar = ({ status, isCameraOn, onStartCapture, onRetry, onNext }: ActionBarProps) => {
+const ActionBar = ({ status, isCameraOn, isVerified, onStartCapture, onRetry, onNext }: ActionBarProps) => {
   if (!isCameraOn) {
     return (
       <button disabled className="w-full py-4 rounded-2xl bg-slate-800 font-semibold text-lg text-slate-500 cursor-not-allowed border border-slate-700">
@@ -197,8 +212,12 @@ const ActionBar = ({ status, isCameraOn, onStartCapture, onRetry, onNext }: Acti
 
   if (status === "idle" || status === "error") {
     return (
-      <button onClick={onStartCapture} className="w-full py-4 rounded-2xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 font-semibold text-lg transition-colors">
-        {status === "error" ? "Try Again" : "Start Recording"}
+      <button
+        onClick={isVerified ? onStartCapture : undefined}
+        disabled={!isVerified}
+        className={`w-full py-4 rounded-2xl font-semibold text-lg transition-colors ${isVerified ? "bg-violet-600 hover:bg-violet-500 active:bg-violet-700" : "bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700"}`}
+      >
+        {!isVerified ? "Verifying…" : status === "error" ? "Try Again" : "Start Recording"}
       </button>
     );
   }
