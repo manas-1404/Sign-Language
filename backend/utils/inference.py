@@ -213,7 +213,7 @@ class InferenceClientFactory:
             )
 
         return ChatGoogleGenerativeAI(
-            model="gemma-4-31b-it",
+            model="gemma-4-e4b-it",
             google_api_key=api_key,
             temperature=0.1,
         )

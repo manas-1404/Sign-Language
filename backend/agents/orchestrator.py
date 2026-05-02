@@ -23,16 +23,22 @@ from backend.utils.inference import InferenceClientFactory
 class SignAnalysisOrchestrator:
     """Coordinates parallel evaluation of hand, face, and body channels.
 
-    Instantiate once per request. The LLM client is created via
+    Instantiated once at container startup (injected into app._shared_orchestrator)
+    and reused across all requests. The LLM client is created via
     InferenceClientFactory which reads INFERENCE_MODE from the environment.
     """
 
     def __init__(self) -> None:
-        """Initialize the orchestrator and all three subagents with a shared LLM client."""
+        """Initialize the orchestrator, all three subagents, and pre-cache tier configs."""
         llm: BaseChatModel = InferenceClientFactory.create()
         self._hand_agent = HandAgent(llm)
         self._face_agent = FaceAgent(llm)
         self._body_agent = BodyAgent(llm)
+        # Load all tier configs once at construction — eliminates per-request file I/O.
+        self._tier_configs: dict[int, dict] = {
+            tier: json.loads(path.read_text(encoding="utf-8"))
+            for tier, path in TierVideoConfig.CONFIG_FILES.items()
+        }
 
     async def analyze(self, tier: int, content_id: int, frames: list[str]) -> FeedbackResponse:
         """Run all three channel analyses concurrently and return aggregated feedback.
@@ -59,22 +65,21 @@ class SignAnalysisOrchestrator:
         return FeedbackResponse(hand=hand_result, face=face_result, body=body_result)
 
     def _load_reference(self, tier: int, content_id: int) -> dict:
-        """Load the ground truth reference dict for a given tier and content ID.
+        """Return the ground truth reference dict for a given tier and content ID.
 
         Args:
             tier: Learning tier (1 or 2).
-            content_id: Numeric key to look up in the tier config file.
+            content_id: Numeric key to look up in the cached tier config.
 
         Returns:
             Dict with 'name', 'hand', 'face', and 'body' reference strings.
 
         Raises:
-            KeyError: If the tier config file does not contain content_id.
+            KeyError: If tier or content_id is not found in the cached config.
         """
-        config_path = TierVideoConfig.CONFIG_FILES[tier]
-
-        with config_path.open("r", encoding="utf-8") as f:
-            config: dict = json.load(f)
+        config = self._tier_configs.get(tier)
+        if config is None:
+            raise KeyError(f"Unknown tier {tier}")
 
         key = str(content_id)
         if key not in config:
