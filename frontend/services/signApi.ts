@@ -28,7 +28,7 @@ export const analyzeSign = async (
   frames: string[],
 ): Promise<FeedbackResponse> => {
   const body: SignRequestBody = { frames };
-  const url = `${API_BASE_URL}/analyze?tier=${tier}&content_id=${contentId}`;
+  const url = `${API_BASE_URL}?tier=${tier}&content_id=${contentId}`;
 
   const response = await fetch(url, {
     method: "POST",
