@@ -17,8 +17,8 @@ Prerequisites:
 
 import modal
 
-MODEL_ID: str = "google/gemma-4-e4b-it"
-VOLUME_NAME: str = "gemma4-weights"
+MODEL_ID: str = "google/gemma-4-26b-a4b-it"
+VOLUME_NAME: str = "gemma4-26b-a4b-weights"
 WEIGHTS_PATH: str = "/weights"
 
 app = modal.App("gemma4-weight-downloader")
