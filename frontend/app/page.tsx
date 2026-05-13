@@ -3,8 +3,6 @@
  */
 
 import Link from "next/link";
-import { TIER1_SIGNS } from "@/constants/signs";
-
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#030711] text-white overflow-x-hidden">
@@ -15,7 +13,6 @@ export default function HomePage() {
         <HowItWorks />
         <AnalysisChannels />
         <PracticeTiers />
-        <SignsGrid />
         <ClosingCTA />
       </main>
       <Footer />
@@ -37,7 +34,6 @@ const Nav = () => (
       <a href="#how-it-works" className="hover:text-white transition-colors duration-150">How it works</a>
       <a href="#features" className="hover:text-white transition-colors duration-150">Features</a>
       <a href="#tiers" className="hover:text-white transition-colors duration-150">Practice tiers</a>
-      <a href="#signs" className="hover:text-white transition-colors duration-150">Signs</a>
     </div>
     <Link
       href="/practice-sign/tier-1"
@@ -76,10 +72,9 @@ const Hero = () => (
           {" "}you miss
         </h1>
 
-        <p className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-[520px]">
-          Practice American Sign Language via your webcam and receive instant feedback
-          across <strong className="text-slate-200">three simultaneous AI channels</strong> —
-          hand shape, facial grammar, and body posture — powered by Gemma 4 on Modal GPUs.
+        <p className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-[480px]">
+          Practice ASL via your webcam. Three AI agents analyze your hand shape, facial grammar,
+          and body posture <strong className="text-slate-200">simultaneously</strong>.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3">
@@ -359,10 +354,6 @@ const HowItWorks = () => (
       <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-6">
         Three steps to real feedback
       </h2>
-      <p className="text-lg text-slate-400 mb-16 max-w-xl">
-        No app install. No account. Just your webcam and a willingness to learn.
-      </p>
-
       <div className="grid md:grid-cols-3 gap-6 relative">
         {/* Connector line */}
         <div className="hidden md:block absolute top-10 left-[calc(33%+1rem)] right-[calc(33%+1rem)] h-px bg-gradient-to-r from-violet-500/40 via-indigo-500/40 to-violet-500/40" />
@@ -371,8 +362,7 @@ const HowItWorks = () => (
           {
             step: "01",
             title: "Choose your tier",
-            description:
-              "Pick Tier 1 for individual ASL signs or Tier 2 for multi-sign phrases. Each tier has a curated lesson sequence.",
+            description: "Pick Tier 1 for individual signs or Tier 2 for multi-sign phrases.",
             icon: (
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
@@ -382,8 +372,7 @@ const HowItWorks = () => (
           {
             step: "02",
             title: "Sign into your webcam",
-            description:
-              "The app shows you a sign to perform. Position yourself and a countdown begins. At the end, frames are captured and sent to the AI.",
+            description: "Position yourself, a countdown runs, and frames are captured and sent to the AI.",
             icon: (
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
@@ -393,8 +382,7 @@ const HowItWorks = () => (
           {
             step: "03",
             title: "Get multi-channel feedback",
-            description:
-              "Three specialized AI agents analyze your hand shape, facial grammar, and body posture simultaneously. Feedback is specific, actionable, and instant.",
+            description: "Three specialist agents run in parallel. Feedback arrives in under 2 seconds.",
             icon: (
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
@@ -422,139 +410,95 @@ const HowItWorks = () => (
 
 // ─── Analysis Channels ────────────────────────────────────────────────────────
 
+const CHANNELS = [
+  {
+    label: "Hand Shape",
+    note: "Is my hand formed correctly?",
+    color: "text-violet-400",
+    border: "border-violet-500/20",
+    bg: "bg-violet-500/[0.06]",
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l.075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 013.15 0V15M6.9 7.575a1.575 1.575 0 10-3.15 0v8.175a6.75 6.75 0 006.75 6.75h2.018a5.25 5.25 0 003.712-1.538l1.732-1.732a5.25 5.25 0 001.538-3.712l.003-2.024a.668.668 0 01.198-.471 1.575 1.575 0 10-2.228-2.228 3.818 3.818 0 00-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0116.35 15m0 0l-3.45-3.45" />
+      </svg>
+    ),
+    result: { correct: true, feedback: "Fingers flat, thumb extended correctly." },
+  },
+  {
+    label: "Facial Grammar",
+    note: "Eyebrow raises and mouth morphemes are ASL grammar — not decoration.",
+    color: "text-fuchsia-400",
+    border: "border-fuchsia-500/20",
+    bg: "bg-fuchsia-500/[0.06]",
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
+      </svg>
+    ),
+    result: { correct: false, feedback: "Raise your eyebrows — required for yes/no questions." },
+  },
+  {
+    label: "Body Posture",
+    note: "Is my torso upright and my arms in the right position?",
+    color: "text-indigo-400",
+    border: "border-indigo-500/20",
+    bg: "bg-indigo-500/[0.06]",
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      </svg>
+    ),
+    result: { correct: true, feedback: "Upright torso, arms at chest height." },
+  },
+] as const;
+
 const AnalysisChannels = () => (
-  <section id="features" className="py-28 px-6 md:px-12 bg-gradient-to-b from-transparent via-violet-950/[0.08] to-transparent">
+  <section id="features" className="py-28 px-6 md:px-12 bg-gradient-to-b from-transparent via-violet-950/[0.06] to-transparent">
     <div className="max-w-7xl mx-auto">
       <SectionLabel>The AI engine</SectionLabel>
-      <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-6">
-        Three agents. One accurate verdict.
+      <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-4">
+        Three agents. One verdict.
       </h2>
-      <p className="text-lg text-slate-400 mb-16 max-w-2xl">
-        Most ASL apps check hand shape and stop there. SignCompanion runs three independent
-        specialist AI agents in parallel — so nothing slips through.
+      <p className="text-slate-400 mb-14 max-w-md">
+        Each agent returns one thing: correct or not, and why.
       </p>
 
-      <div className="space-y-6">
-        {/* Hand Shape */}
-        <ChannelCard
-          color="violet"
-          badge="Agent 01"
-          title="Hand Shape Analysis"
-          description="Tracks all 21 hand landmark positions captured across multiple frames. Evaluates finger curl, thumb placement, handshape orientation, and formation accuracy — then cross-references against the ground-truth reference for the sign being practiced."
-          callout="Finger positions, thumb extension, wrist orientation. Every joint tracked."
-          highlights={["Finger curl accuracy", "Thumb placement", "Wrist orientation", "Formation hold quality"]}
-          icon={
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l.075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 013.15 0V15M6.9 7.575a1.575 1.575 0 10-3.15 0v8.175a6.75 6.75 0 006.75 6.75h2.018a5.25 5.25 0 003.712-1.538l1.732-1.732a5.25 5.25 0 001.538-3.712l.003-2.024a.668.668 0 01.198-.471 1.575 1.575 0 10-2.228-2.228 3.818 3.818 0 00-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0116.35 15m0 0l-3.45-3.45" />
-            </svg>
-          }
-        />
+      <div className="grid md:grid-cols-3 gap-5">
+        {CHANNELS.map((ch) => (
+          <div key={ch.label} className={`rounded-2xl border bg-white/[0.02] ${ch.border} p-6 space-y-5`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl ${ch.bg} border ${ch.border} flex items-center justify-center ${ch.color}`}>
+                {ch.icon}
+              </div>
+              <span className={`font-bold text-white`}>{ch.label}</span>
+            </div>
 
-        {/* Facial Grammar */}
-        <ChannelCard
-          color="fuchsia"
-          badge="Agent 02"
-          title="Facial Grammar — Not Just Expression"
-          description="In ASL, eyebrow raises, furrowed brows, mouth morphemes, and head tilts are grammatical — not aesthetic. This agent was specifically trained to evaluate non-manual markers as linguistic elements, the same way a human ASL linguist would."
-          callout="The eyebrow raise isn't decoration. It's ASL grammar. Most apps ignore it. We don't."
-          highlights={["Eyebrow position (WH vs. yes/no)", "Mouth morphemes", "Head tilt direction", "Sustained NMM across phrase"]}
-          icon={
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
-            </svg>
-          }
-        />
+            <p className="text-base text-slate-400">{ch.note}</p>
 
-        {/* Body Posture */}
-        <ChannelCard
-          color="indigo"
-          badge="Agent 03"
-          title="Body & Posture Evaluation"
-          description="Evaluates upper body orientation, torso lean, shoulder alignment, and arm placement relative to the signing space. Ensures your body is positioned correctly to produce the sign in the right location at the right height."
-          callout="Where you sign matters as much as how you sign. Location in signing space is semantic."
-          highlights={["Torso orientation", "Shoulder alignment", "Arm height & extension", "Signing space location"]}
-          icon={
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-            </svg>
-          }
-        />
+            {/* Sample output */}
+            <div className={`rounded-xl border ${ch.result.correct ? "bg-emerald-950/40 border-emerald-500/20" : "bg-rose-950/40 border-rose-500/25"} p-3.5`}>
+              <div className="flex items-center gap-2 mb-1.5">
+                {ch.result.correct ? (
+                  <svg className="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+                <span className={`text-xs font-bold uppercase tracking-wider ${ch.result.correct ? "text-emerald-400" : "text-rose-400"}`}>
+                  {ch.result.correct ? "Correct" : "Needs work"}
+                </span>
+              </div>
+              <p className="text-sm text-slate-400 leading-relaxed">{ch.result.feedback}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   </section>
 );
-
-interface ChannelCardProps {
-  color: "violet" | "fuchsia" | "indigo";
-  badge: string;
-  title: string;
-  description: string;
-  callout: string;
-  highlights: string[];
-  icon: React.ReactNode;
-}
-
-const colorMap = {
-  violet: {
-    badge: "bg-violet-500/10 border-violet-500/20 text-violet-400",
-    icon: "from-violet-500/15 to-violet-600/10 border-violet-500/20 text-violet-400",
-    border: "hover:border-violet-500/20",
-    dot: "bg-violet-400",
-    callout: "bg-violet-950/40 border-violet-500/20 text-violet-300",
-  },
-  fuchsia: {
-    badge: "bg-fuchsia-500/10 border-fuchsia-500/20 text-fuchsia-400",
-    icon: "from-fuchsia-500/15 to-fuchsia-600/10 border-fuchsia-500/20 text-fuchsia-400",
-    border: "hover:border-fuchsia-500/20",
-    dot: "bg-fuchsia-400",
-    callout: "bg-fuchsia-950/40 border-fuchsia-500/20 text-fuchsia-300",
-  },
-  indigo: {
-    badge: "bg-indigo-500/10 border-indigo-500/20 text-indigo-400",
-    icon: "from-indigo-500/15 to-indigo-600/10 border-indigo-500/20 text-indigo-400",
-    border: "hover:border-indigo-500/20",
-    dot: "bg-indigo-400",
-    callout: "bg-indigo-950/40 border-indigo-500/20 text-indigo-300",
-  },
-};
-
-const ChannelCard = ({ color, badge, title, description, callout, highlights, icon }: ChannelCardProps) => {
-  const c = colorMap[color];
-  return (
-    <div className={`rounded-2xl bg-white/[0.02] border border-white/[0.07] p-7 md:p-9 transition-all duration-200 hover:bg-white/[0.04] ${c.border}`}>
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Left */}
-        <div className="md:w-1/2 space-y-5">
-          <div className="flex items-center gap-3">
-            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br border flex items-center justify-center ${c.icon}`}>
-              {icon}
-            </div>
-            <span className={`px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest ${c.badge}`}>
-              {badge}
-            </span>
-          </div>
-          <h3 className="text-2xl font-black text-white">{title}</h3>
-          <p className="text-slate-400 leading-relaxed">{description}</p>
-        </div>
-
-        {/* Right */}
-        <div className="md:w-1/2 space-y-5">
-          <div className={`rounded-xl border px-5 py-4 text-sm font-medium leading-relaxed ${c.callout}`}>
-            "{callout}"
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {highlights.map((h) => (
-              <div key={h} className="flex items-center gap-2">
-                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${c.dot}`} />
-                <span className="text-sm text-slate-400">{h}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // ─── Practice Tiers ───────────────────────────────────────────────────────────
 
@@ -562,63 +506,39 @@ const PracticeTiers = () => (
   <section id="tiers" className="py-28 px-6 md:px-12">
     <div className="max-w-7xl mx-auto">
       <SectionLabel>Practice tiers</SectionLabel>
-      <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-6">
+      <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-14">
         Start simple. Progress naturally.
       </h2>
-      <p className="text-lg text-slate-400 mb-16 max-w-xl">
-        Two active tiers, structured from individual signs to full multi-sign phrases with ASL-correct word order.
-      </p>
 
       <div className="grid md:grid-cols-3 gap-5">
         <TierCard
           tier="Tier 1"
           title="Individual Signs"
-          description="Master foundational ASL signs one at a time with focused, single-sign practice sessions."
+          description="Learn 10 foundational ASL signs. Practice one at a time, retry as many times as you like."
           href="/practice-sign/tier-1"
           accentClass="from-violet-500 to-violet-600"
           badgeClass="bg-violet-500/10 border-violet-500/20 text-violet-400"
           borderClass="hover:border-violet-500/30"
-          glowClass="shadow-violet-500/20"
-          details={[
-            "10 foundational ASL signs",
-            "4 frames captured per session",
-            "~2-second recording window",
-            "1280×720 capture resolution",
-          ]}
           active
         />
         <TierCard
           tier="Tier 2"
           title="Short Phrases"
-          description="Practice multi-sign sequences with correct ASL word order — a distinct grammar from English."
+          description="Practice 10 multi-sign sequences in ASL word order — structurally distinct from English."
           href="/practice-sign/tier-2"
           accentClass="from-indigo-500 to-indigo-600"
           badgeClass="bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
           borderClass="hover:border-indigo-500/30"
-          glowClass="shadow-indigo-500/20"
-          details={[
-            "10 multi-sign phrases",
-            "8 frames per recording",
-            "~3-second recording window",
-            "ASL-order phrase structure",
-          ]}
           active
         />
         <TierCard
           tier="Tier 3"
           title="ASL Grammar"
-          description="Sustained non-manual markers across full yes/no questions — where facial grammar is indispensable."
+          description="Full yes/no questions with sustained non-manual markers. Coming once you've nailed Tiers 1 and 2."
           href="#"
           accentClass="from-slate-600 to-slate-700"
           badgeClass="bg-slate-700/30 border-slate-600/30 text-slate-500"
           borderClass=""
-          glowClass=""
-          details={[
-            "Full yes/no questions",
-            "Sustained NMM evaluation",
-            "Discourse-level signing",
-            "Advanced grammatical checks",
-          ]}
           active={false}
         />
       </div>
@@ -634,47 +554,34 @@ interface TierCardProps {
   accentClass: string;
   badgeClass: string;
   borderClass: string;
-  glowClass: string;
-  details: string[];
   active: boolean;
 }
 
-const TierCard = ({ tier, title, description, href, accentClass, badgeClass, borderClass, glowClass, details, active }: TierCardProps) => {
+const TierCard = ({ tier, title, description, href, accentClass, badgeClass, borderClass, active }: TierCardProps) => {
   const inner = (
     <div
-      className={`relative h-full rounded-2xl bg-white/[0.02] border border-white/[0.07] p-7 flex flex-col gap-6 transition-all duration-200 ${
-        active ? `hover:bg-white/[0.04] ${borderClass} hover:shadow-xl ${glowClass}` : "opacity-50 cursor-not-allowed"
+      className={`relative h-full rounded-2xl bg-white/[0.02] border border-white/[0.07] p-7 flex flex-col gap-5 transition-all duration-200 ${
+        active ? `hover:bg-white/[0.04] ${borderClass}` : "opacity-50 cursor-not-allowed"
       }`}
     >
-      {/* Top bar accent */}
       <div className={`absolute top-0 inset-x-0 h-px rounded-t-2xl bg-gradient-to-r ${accentClass} opacity-60`} />
 
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className={`px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest ${badgeClass}`}>
-            {tier}
-          </span>
-          {!active && (
-            <span className="text-[10px] text-slate-600 font-semibold uppercase tracking-wider">Coming Soon</span>
-          )}
-        </div>
+      <div className="flex items-center justify-between">
+        <span className={`px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest ${badgeClass}`}>
+          {tier}
+        </span>
+        {!active && (
+          <span className="text-[10px] text-slate-600 font-semibold uppercase tracking-wider">Coming Soon</span>
+        )}
+      </div>
+
+      <div className="flex-1">
         <h3 className="text-xl font-black text-white mb-2">{title}</h3>
         <p className="text-sm text-slate-400 leading-relaxed">{description}</p>
       </div>
 
-      <ul className="space-y-2 flex-1">
-        {details.map((d) => (
-          <li key={d} className="flex items-center gap-2.5 text-sm text-slate-400">
-            <svg className="w-4 h-4 text-slate-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {d}
-          </li>
-        ))}
-      </ul>
-
       {active && (
-        <div className={`inline-flex items-center gap-1.5 text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r ${accentClass}`}>
+        <div className={`text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r ${accentClass}`}>
           Start practicing →
         </div>
       )}
@@ -683,48 +590,6 @@ const TierCard = ({ tier, title, description, href, accentClass, badgeClass, bor
 
   return active ? <Link href={href} className="block h-full">{inner}</Link> : <div>{inner}</div>;
 };
-
-// ─── Signs Grid ────────────────────────────────────────────────────────────────
-
-const SignsGrid = () => (
-  <section id="signs" className="py-28 px-6 md:px-12 bg-gradient-to-b from-transparent via-indigo-950/[0.06] to-transparent">
-    <div className="max-w-7xl mx-auto">
-      <SectionLabel>Tier 1 curriculum</SectionLabel>
-      <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-6">
-        10 foundational signs to master
-      </h2>
-      <p className="text-lg text-slate-400 mb-14 max-w-xl">
-        Each sign was selected to cover a broad range of handshapes and test the full evaluation stack.
-      </p>
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-        {TIER1_SIGNS.map((sign, i) => (
-          <div
-            key={sign.id}
-            className="group rounded-xl bg-white/[0.02] border border-white/[0.07] p-4 hover:bg-white/[0.05] hover:border-violet-500/20 transition-all duration-200 cursor-default"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] text-violet-500 font-mono font-bold">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-            </div>
-            <p className="font-bold text-white text-[15px] mb-1.5">{sign.name}</p>
-            <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-3">{sign.description}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-10 text-center">
-        <Link
-          href="/practice-sign/tier-1"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.10] font-semibold text-slate-300 hover:text-white text-sm transition-all duration-200"
-        >
-          Start learning all 10 signs →
-        </Link>
-      </div>
-    </div>
-  </section>
-);
 
 // ─── Closing CTA ──────────────────────────────────────────────────────────────
 
@@ -745,8 +610,8 @@ const ClosingCTA = () => (
           <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6">
             Ready to start signing?
           </h2>
-          <p className="text-lg text-slate-400 mb-10 max-w-lg mx-auto leading-relaxed">
-            Open your webcam, pick your first sign, and get feedback that goes deeper than any other ASL tool.
+          <p className="text-lg text-slate-400 mb-10 max-w-md mx-auto">
+            Open your webcam. Pick a sign. Get feedback that goes deeper.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
