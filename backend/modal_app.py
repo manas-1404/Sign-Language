@@ -94,11 +94,15 @@ _cls_kwargs: dict = {
     "secrets": [modal.Secret.from_name("sign-language-secrets")],
     "timeout": 600,
     "startup_timeout": 600,
-    "scaledown_window": 60,
+    "scaledown_window": 30,
 }
 if _INFERENCE_MODE == "local":
     _cls_kwargs["gpu"] = "A100-80GB"
     _cls_kwargs["volumes"] = {WEIGHTS_PATH: _model_volume}
+else:
+    # Snapshot the container after API-mode initialization so cold starts skip
+    # import resolution and orchestrator construction on subsequent boots.
+    _cls_kwargs["enable_memory_snapshot"] = True
 
 
 @app.cls(**_cls_kwargs)
@@ -110,16 +114,26 @@ class SignLanguageService:
     kwargs and confirmed at container startup via the Modal Secret.
     """
 
-    @modal.enter()
-    def startup(self) -> None:
-        """Initialize the correct inference backend based on INFERENCE_MODE."""
+    @modal.enter(snap=True)
+    def snapshot_init(self) -> None:
+        """Run before snapshot: import heavy deps and build the orchestrator.
+
+        Only meaningful in API mode — this state is captured once and restored
+        on every subsequent cold start, skipping re-initialization entirely.
+        In local (GPU/SGLang) mode this method still runs but snapshotting is
+        disabled so it behaves identically to the old single-enter path.
+        """
         sys.path.insert(0, "/root")
         self._mode: str = os.environ.get("INFERENCE_MODE", "api").lower()
 
+        if self._mode != "local":
+            self._start_api_mode()
+
+    @modal.enter()
+    def post_restore_init(self) -> None:
+        """Run after snapshot restore (or on first boot in local mode)."""
         if self._mode == "local":
             self._start_sglang_mode()
-        else:
-            self._start_api_mode()
 
     def _start_sglang_mode(self) -> None:
         """Launch the SGLang subprocess server and wait until healthy."""
