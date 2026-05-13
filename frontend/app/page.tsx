@@ -443,9 +443,9 @@ const CHANNELS = [
   {
     label: "Hand Shape",
     note: "Is my hand formed correctly?",
-    color: "text-violet-400",
-    border: "border-violet-500/20",
-    bg: "bg-violet-500/[0.06]",
+    color: "text-violet-600",
+    border: "border-violet-200",
+    bg: "bg-violet-100",
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l.075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 013.15 0V15M6.9 7.575a1.575 1.575 0 10-3.15 0v8.175a6.75 6.75 0 006.75 6.75h2.018a5.25 5.25 0 003.712-1.538l1.732-1.732a5.25 5.25 0 001.538-3.712l.003-2.024a.668.668 0 01.198-.471 1.575 1.575 0 10-2.228-2.228 3.818 3.818 0 00-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0116.35 15m0 0l-3.45-3.45" />
@@ -456,9 +456,9 @@ const CHANNELS = [
   {
     label: "Facial Grammar",
     note: "Eyebrow raises and mouth morphemes are ASL grammar — not decoration.",
-    color: "text-fuchsia-400",
-    border: "border-fuchsia-500/20",
-    bg: "bg-fuchsia-500/[0.06]",
+    color: "text-fuchsia-600",
+    border: "border-fuchsia-200",
+    bg: "bg-fuchsia-100",
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
@@ -469,9 +469,9 @@ const CHANNELS = [
   {
     label: "Body Posture",
     note: "Is my torso upright and my arms in the right position?",
-    color: "text-indigo-400",
-    border: "border-indigo-500/20",
-    bg: "bg-indigo-500/[0.06]",
+    color: "text-indigo-600",
+    border: "border-indigo-200",
+    bg: "bg-indigo-100",
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -505,22 +505,22 @@ const AnalysisChannels = () => (
             <p className="text-base text-slate-600">{ch.note}</p>
 
             {/* Sample output */}
-            <div className={`rounded-xl border ${ch.result.correct ? "bg-emerald-950/40 border-emerald-500/20" : "bg-rose-950/40 border-rose-500/25"} p-3.5`}>
+            <div className={`rounded-xl border ${ch.result.correct ? "bg-emerald-50 border-emerald-200" : "bg-rose-50 border-rose-200"} p-3.5`}>
               <div className="flex items-center gap-2 mb-1.5">
                 {ch.result.correct ? (
-                  <svg className="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
-                  <svg className="w-3.5 h-3.5 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <svg className="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 )}
-                <span className={`text-xs font-bold uppercase tracking-wider ${ch.result.correct ? "text-emerald-400" : "text-rose-400"}`}>
+                <span className={`text-xs font-bold uppercase tracking-wider ${ch.result.correct ? "text-emerald-700" : "text-rose-700"}`}>
                   {ch.result.correct ? "Correct" : "Needs work"}
                 </span>
               </div>
-              <p className="text-sm text-slate-400 leading-relaxed">{ch.result.feedback}</p>
+              <p className="text-sm text-slate-700 leading-relaxed">{ch.result.feedback}</p>
             </div>
           </div>
         ))}
