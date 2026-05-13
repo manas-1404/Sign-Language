@@ -3,13 +3,38 @@
  */
 
 import Link from "next/link";
-export default function HomePage() {
+import { list } from "@vercel/blob";
+
+interface ShowcaseVideos {
+  heroUrl: string | null;
+  tier1Url: string | null;
+  tier2Url: string | null;
+}
+
+async function fetchShowcaseVideos(): Promise<ShowcaseVideos> {
+  try {
+    const [r1, r2] = await Promise.all([
+      list({ prefix: "tier-1/", token: process.env.BLOB_READ_WRITE_TOKEN }),
+      list({ prefix: "tier-2/", token: process.env.BLOB_READ_WRITE_TOKEN }),
+    ]);
+    return {
+      heroUrl:  r2.blobs.find((b) => b.pathname.endsWith("/nice-meet-you-again.mp4"))?.url ?? null,
+      tier1Url: r1.blobs.find((b) => b.pathname.endsWith("/play.mp4"))?.url ?? null,
+      tier2Url: r2.blobs.find((b) => b.pathname.endsWith("/now-we-play.mp4"))?.url ?? null,
+    };
+  } catch {
+    return { heroUrl: null, tier1Url: null, tier2Url: null };
+  }
+}
+
+export default async function HomePage() {
+  const { heroUrl, tier1Url, tier2Url } = await fetchShowcaseVideos();
   return (
     <div className="min-h-screen bg-[#030711] text-white overflow-x-hidden">
       <Nav />
       <main>
-        <Hero />
-        <PoweredBy />
+        <Hero videoUrl={heroUrl} />
+        <VideoShowcase tier1Url={tier1Url} tier2Url={tier2Url} />
         <HowItWorks />
         <AnalysisChannels />
         <PracticeTiers />
@@ -46,16 +71,16 @@ const Nav = () => (
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
-const Hero = () => (
-  <section className="relative min-h-screen flex items-center pt-24 pb-20 px-6 md:px-12 overflow-hidden">
+const Hero = ({ videoUrl }: { videoUrl: string | null }) => (
+  <section className="relative flex items-center pt-32 pb-16 px-6 md:px-12 overflow-hidden">
     {/* Background orbs */}
     <div className="absolute top-1/4 -left-32 w-[700px] h-[700px] rounded-full bg-violet-600/[0.07] blur-[140px] pointer-events-none animate-pulse-glow" />
     <div className="absolute top-1/3 -right-32 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.06] blur-[120px] pointer-events-none animate-pulse-glow" style={{ animationDelay: "2s" }} />
     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] rounded-full bg-violet-900/[0.12] blur-[100px] pointer-events-none" />
 
-    <div className="relative max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-14 lg:gap-10 items-center">
+    <div className="relative max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-10 lg:gap-8 items-center">
       {/* Left: Copy */}
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[11px] font-semibold text-violet-400 uppercase tracking-[0.12em]">
           <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-blink" />
           Real-time AI feedback
@@ -112,22 +137,20 @@ const Hero = () => (
       </div>
 
       {/* Right: Product mockup */}
-      <ProductMockup />
+      <ProductMockup videoUrl={videoUrl} />
     </div>
   </section>
 );
 
 // ─── Product Mockup ───────────────────────────────────────────────────────────
 
-const ProductMockup = () => (
+const ProductMockup = ({ videoUrl }: { videoUrl: string | null }) => (
   <div className="relative">
-    {/* Outer glow */}
     <div className="absolute -inset-8 bg-violet-600/15 blur-3xl rounded-full animate-pulse-glow pointer-events-none" />
     <div className="absolute -inset-8 bg-indigo-600/10 blur-2xl rounded-full animate-pulse-glow pointer-events-none" style={{ animationDelay: "1.5s" }} />
 
-    {/* Browser chrome */}
     <div className="relative bg-[#0d1117] rounded-2xl border border-white/[0.08] shadow-[0_32px_80px_rgba(0,0,0,0.6)] overflow-hidden">
-      {/* Browser top bar */}
+      {/* Browser chrome */}
       <div className="flex items-center gap-2 px-4 py-3 bg-[#161b22] border-b border-white/[0.05]">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
@@ -143,141 +166,54 @@ const ProductMockup = () => (
 
       {/* App content */}
       <div className="p-5 bg-[#0d1117]">
-        {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-medium">Tier 1 · Sign 3 of 10</p>
-            <p className="text-white font-bold text-lg leading-tight mt-0.5">Today</p>
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-medium">Tier 2 · Phrase 5 of 10</p>
+            <p className="text-white font-bold text-lg leading-tight mt-0.5">Nice to meet you again</p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-blink" />
-              <span className="text-[10px] text-emerald-400 font-semibold">LIVE</span>
-            </div>
+          <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-blink" />
+            <span className="text-[10px] text-emerald-400 font-semibold">LIVE</span>
           </div>
         </div>
 
         <div className="flex gap-4">
-          {/* Video area */}
+          {/* Reference video */}
           <div className="flex-1 min-w-0">
-            <div className="relative aspect-video bg-[#0a0f1a] rounded-xl overflow-hidden border border-white/[0.05]">
-              {/* Grid overlay */}
-              <div
-                className="absolute inset-0 opacity-[0.08]"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(rgba(139,92,246,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.5) 1px, transparent 1px)",
-                  backgroundSize: "28px 28px",
-                }}
-              />
-              {/* Gradient bg */}
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-800/30 via-[#0a0f1a] to-slate-900/50" />
-
-              {/* Scan line */}
-              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-violet-400/70 to-transparent animate-scanline pointer-events-none" />
-
-              {/* Corner viewfinder brackets */}
-              {[
-                "top-3 left-3 border-l-2 border-t-2",
-                "top-3 right-3 border-r-2 border-t-2",
-                "bottom-3 left-3 border-l-2 border-b-2",
-                "bottom-3 right-3 border-r-2 border-b-2",
-              ].map((cls, i) => (
-                <div key={i} className={`absolute w-5 h-5 border-violet-400/60 ${cls}`} />
-              ))}
-
-              {/* Sign label watermark */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-4xl font-black text-white/[0.06] tracking-[0.15em] uppercase select-none">TODAY</span>
-              </div>
-
-              {/* Landmark dots — simulated hand tracking */}
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 280 158" fill="none">
-                {/* Wrist */}
-                <circle cx="140" cy="130" r="3" fill="rgba(139,92,246,0.7)" />
-                {/* Palm knuckles */}
-                <circle cx="118" cy="105" r="2.5" fill="rgba(139,92,246,0.6)" />
-                <circle cx="130" cy="100" r="2.5" fill="rgba(139,92,246,0.6)" />
-                <circle cx="143" cy="98" r="2.5" fill="rgba(139,92,246,0.6)" />
-                <circle cx="155" cy="100" r="2.5" fill="rgba(139,92,246,0.6)" />
-                <circle cx="165" cy="105" r="2.5" fill="rgba(139,92,246,0.6)" />
-                {/* Index finger */}
-                <circle cx="115" cy="90" r="2" fill="rgba(167,139,250,0.7)" />
-                <circle cx="112" cy="76" r="2" fill="rgba(167,139,250,0.7)" />
-                <circle cx="110" cy="64" r="2.5" fill="rgba(167,139,250,0.9)" />
-                {/* Middle finger */}
-                <circle cx="128" cy="85" r="2" fill="rgba(167,139,250,0.7)" />
-                <circle cx="127" cy="70" r="2" fill="rgba(167,139,250,0.7)" />
-                <circle cx="126" cy="57" r="2.5" fill="rgba(167,139,250,0.9)" />
-                {/* Ring finger */}
-                <circle cx="142" cy="84" r="2" fill="rgba(167,139,250,0.7)" />
-                <circle cx="142" cy="69" r="2" fill="rgba(167,139,250,0.7)" />
-                <circle cx="142" cy="56" r="2.5" fill="rgba(167,139,250,0.9)" />
-                {/* Pinky */}
-                <circle cx="156" cy="86" r="2" fill="rgba(167,139,250,0.7)" />
-                <circle cx="158" cy="73" r="2" fill="rgba(167,139,250,0.7)" />
-                <circle cx="160" cy="63" r="2.5" fill="rgba(167,139,250,0.9)" />
-                {/* Thumb */}
-                <circle cx="168" cy="110" r="2" fill="rgba(167,139,250,0.7)" />
-                <circle cx="176" cy="100" r="2.5" fill="rgba(167,139,250,0.9)" />
-                {/* Connecting lines */}
-                <line x1="140" y1="130" x2="118" y2="105" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="118" y1="105" x2="115" y2="90" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="115" y1="90" x2="112" y2="76" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="112" y1="76" x2="110" y2="64" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="130" y1="100" x2="128" y2="85" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="128" y1="85" x2="127" y2="70" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="127" y1="70" x2="126" y2="57" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="143" y1="98" x2="142" y2="84" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="142" y1="84" x2="142" y2="69" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="142" y1="69" x2="142" y2="56" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="155" y1="100" x2="156" y2="86" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="156" y1="86" x2="158" y2="73" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-                <line x1="158" y1="73" x2="160" y2="63" stroke="rgba(139,92,246,0.25)" strokeWidth="1" />
-              </svg>
-
-              {/* REC badge */}
-              <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm rounded-md px-2 py-1 border border-white/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-blink" />
-                <span className="text-[9px] text-white font-mono tracking-widest">REC</span>
-              </div>
-
-              {/* Countdown */}
-              <div className="absolute bottom-2.5 inset-x-0 text-center">
-                <span className="text-[10px] text-white/60 bg-black/50 px-2 py-0.5 rounded-full backdrop-blur-sm">
-                  Capturing in <span className="text-white font-bold">2s</span>…
-                </span>
+            <div className="relative rounded-xl overflow-hidden border border-white/[0.06] bg-black">
+              {videoUrl ? (
+                <video
+                  src={videoUrl}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full object-contain"
+                />
+              ) : (
+                <div className="aspect-video flex items-center justify-center bg-[#0a0f1a]">
+                  <span className="text-4xl opacity-10">🤟</span>
+                </div>
+              )}
+              <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-sm border border-white/10 text-[9px] text-slate-400 font-mono uppercase tracking-widest">
+                Reference
               </div>
             </div>
 
-            {/* Progress bar */}
             <div className="mt-3 flex items-center gap-2.5">
               <div className="flex-1 h-1 bg-white/[0.06] rounded-full overflow-hidden">
-                <div className="h-full w-[30%] bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full" />
+                <div className="h-full w-1/2 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full" />
               </div>
-              <span className="text-[10px] text-slate-500 tabular-nums">3 / 10</span>
+              <span className="text-[10px] text-slate-500 tabular-nums">5 / 10</span>
             </div>
           </div>
 
           {/* Analysis panel */}
           <div className="w-44 flex-shrink-0 space-y-2.5">
             <p className="text-[9px] text-slate-500 uppercase tracking-[0.12em] font-semibold">AI Analysis</p>
-
-            <MockFeedbackCard
-              label="Hand Shape"
-              correct={true}
-              detail="Both hands bent correctly. Drop is crisp."
-            />
-            <MockFeedbackCard
-              label="Facial Grammar"
-              correct={false}
-              detail="Raise brows — required for yes/no questions."
-            />
-            <MockFeedbackCard
-              label="Body Posture"
-              correct={true}
-              detail="Upright torso, arms level. Well done."
-            />
+            <MockFeedbackCard label="Hand Shape"     correct={true}  detail="NICE → MEET → YOU → AGAIN all formed correctly." />
+            <MockFeedbackCard label="Facial Grammar" correct={false} detail="Raise brows — required for yes/no questions." />
+            <MockFeedbackCard label="Body Posture"   correct={true}  detail="Upright torso, arms at chest height." />
           </div>
         </div>
       </div>
@@ -323,32 +259,125 @@ const MockFeedbackCard = ({ label, correct, detail }: MockFeedbackCardProps) => 
 
 // ─── Powered By ───────────────────────────────────────────────────────────────
 
-const PoweredBy = () => (
-  <div className="border-y border-white/[0.05] py-5 px-6 md:px-12">
-    <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-10">
-      <p className="text-xs text-slate-600 uppercase tracking-widest font-semibold shrink-0">Powered by</p>
-      <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
-        {[
-          { name: "Gemma 4", sub: "Vision LLM" },
-          { name: "Modal", sub: "Serverless GPU" },
-          { name: "Next.js 16", sub: "Frontend" },
-          { name: "Vercel", sub: "Hosting" },
-          { name: "LangGraph", sub: "Agent orchestration" },
-        ].map((tech) => (
-          <div key={tech.name} className="text-center">
-            <p className="text-sm font-semibold text-slate-300">{tech.name}</p>
-            <p className="text-[10px] text-slate-600 mt-0.5">{tech.sub}</p>
-          </div>
-        ))}
+// ─── Video Showcase ───────────────────────────────────────────────────────────
+
+interface VideoShowcaseProps {
+  tier1Url: string | null;
+  tier2Url: string | null;
+}
+
+const VideoShowcase = ({ tier1Url, tier2Url }: VideoShowcaseProps) => (
+  <section className="py-16 px-6 md:px-12">
+    <div className="max-w-7xl mx-auto">
+      <SectionLabel>See it in action</SectionLabel>
+      <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-3">
+        Watch the correct form.<br className="hidden sm:block" /> Then try it yourself.
+      </h2>
+      <p className="text-slate-400 mb-10 max-w-md">
+        Every sign comes with a looping reference video. Know exactly what you&apos;re aiming for before you hit record.
+      </p>
+
+      <div className="grid md:grid-cols-2 gap-5">
+        <ShowcaseCard
+          tier={1}
+          tierLabel="Individual Sign"
+          signName="Play"
+          aslNote="Both Y-hands shake at chest level"
+          videoUrl={tier1Url}
+          color="violet"
+        />
+        <ShowcaseCard
+          tier={2}
+          tierLabel="Short Phrase"
+          signName="Now We Play"
+          aslNote="NOW · WE · PLAY"
+          videoUrl={tier2Url}
+          color="indigo"
+        />
       </div>
     </div>
-  </div>
+  </section>
 );
+
+interface ShowcaseCardProps {
+  tier: number;
+  tierLabel: string;
+  signName: string;
+  aslNote: string;
+  videoUrl: string | null;
+  color: "violet" | "indigo";
+}
+
+const SHOWCASE_COLORS = {
+  violet: {
+    glow: "bg-violet-500",
+    border: "border-violet-500/25",
+    badge: "bg-violet-500/20 border-violet-400/30 text-violet-300",
+    note: "text-violet-400",
+    shimmer: "from-violet-500/0 via-violet-500/10 to-violet-500/0",
+  },
+  indigo: {
+    glow: "bg-indigo-500",
+    border: "border-indigo-500/25",
+    badge: "bg-indigo-500/20 border-indigo-400/30 text-indigo-300",
+    note: "text-indigo-400",
+    shimmer: "from-indigo-500/0 via-indigo-500/10 to-indigo-500/0",
+  },
+};
+
+const ShowcaseCard = ({ tier, tierLabel, signName, aslNote, videoUrl, color }: ShowcaseCardProps) => {
+  const c = SHOWCASE_COLORS[color];
+  return (
+    <div className="relative group">
+      {/* Hover glow */}
+      <div className={`absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl ${c.glow}/20`} />
+
+      <div className={`relative rounded-2xl overflow-hidden border ${c.border} bg-[#080d14]`}>
+        {/* Tier badge */}
+        <div className="absolute top-3 left-3 z-10">
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest backdrop-blur-sm ${c.badge}`}>
+            <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80 animate-blink" />
+            Tier {tier} · {tierLabel}
+          </span>
+        </div>
+
+        {/* Reference badge */}
+        <div className="absolute top-3 right-3 z-10">
+          <span className="px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm border border-white/10 text-[9px] text-slate-400 font-mono uppercase tracking-widest">
+            Reference
+          </span>
+        </div>
+
+        {/* Video or placeholder */}
+        {videoUrl ? (
+          <video
+            src={videoUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full aspect-[3/4] sm:aspect-video object-contain bg-[#060b12] group-hover:scale-[1.01] transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full aspect-[3/4] sm:aspect-video bg-[#060b12] flex items-center justify-center">
+            <span className="text-5xl opacity-10">🤟</span>
+          </div>
+        )}
+
+        {/* Bottom gradient overlay */}
+        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#080d14] via-[#080d14]/80 to-transparent pt-12 pb-5 px-5">
+          <p className="font-black text-white text-2xl leading-tight">{signName}</p>
+          <p className={`text-sm font-mono mt-1 ${c.note}`}>{aslNote}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // ─── How It Works ─────────────────────────────────────────────────────────────
 
 const HowItWorks = () => (
-  <section id="how-it-works" className="py-28 px-6 md:px-12">
+  <section id="how-it-works" className="py-16 px-6 md:px-12">
     <div className="max-w-7xl mx-auto">
       <SectionLabel>How it works</SectionLabel>
       <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-6">
@@ -459,7 +488,7 @@ const AnalysisChannels = () => (
       <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-4">
         Three agents. One verdict.
       </h2>
-      <p className="text-slate-400 mb-14 max-w-md">
+      <p className="text-slate-400 mb-8 max-w-md">
         Each agent returns one thing: correct or not, and why.
       </p>
 
@@ -503,10 +532,10 @@ const AnalysisChannels = () => (
 // ─── Practice Tiers ───────────────────────────────────────────────────────────
 
 const PracticeTiers = () => (
-  <section id="tiers" className="py-28 px-6 md:px-12">
+  <section id="tiers" className="py-16 px-6 md:px-12">
     <div className="max-w-7xl mx-auto">
       <SectionLabel>Practice tiers</SectionLabel>
-      <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-14">
+      <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-8">
         Start simple. Progress naturally.
       </h2>
 
@@ -594,23 +623,23 @@ const TierCard = ({ tier, title, description, href, accentClass, badgeClass, bor
 // ─── Closing CTA ──────────────────────────────────────────────────────────────
 
 const ClosingCTA = () => (
-  <section className="py-28 px-6 md:px-12">
+  <section className="py-16 px-6 md:px-12">
     <div className="max-w-7xl mx-auto">
-      <div className="relative rounded-3xl bg-gradient-to-br from-violet-950/60 to-indigo-950/60 border border-violet-500/20 p-12 md:p-20 overflow-hidden text-center">
+      <div className="relative rounded-3xl bg-gradient-to-br from-violet-950/60 to-indigo-950/60 border border-violet-500/20 p-10 md:p-14 overflow-hidden text-center">
         {/* Background orbs */}
         <div className="absolute top-0 left-1/4 w-72 h-72 bg-violet-600/20 rounded-full blur-[80px] animate-pulse-glow pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-indigo-600/20 rounded-full blur-[80px] animate-pulse-glow pointer-events-none" style={{ animationDelay: "2s" }} />
 
         <div className="relative">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[11px] font-semibold text-violet-400 uppercase tracking-[0.12em] mb-7">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[11px] font-semibold text-violet-400 uppercase tracking-[0.12em] mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-blink" />
             No account required
           </div>
 
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6">
+          <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
             Ready to start signing?
           </h2>
-          <p className="text-lg text-slate-400 mb-10 max-w-md mx-auto">
+          <p className="text-lg text-slate-400 mb-7 max-w-md mx-auto">
             Open your webcam. Pick a sign. Get feedback that goes deeper.
           </p>
 
