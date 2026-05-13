@@ -1,20 +1,35 @@
 """Modal production deployment for the sign language analysis backend.
 
-Deploys a web endpoint backed by an A100-80GB GPU running a SGLang model server.
+Supports two inference modes, selected by setting INFERENCE_MODE in your local
+shell BEFORE running the deploy command.  The value must also be present in the
+'sign-language-secrets' Modal Secret so containers pick it up at runtime.
 
-Architecture:
-    @modal.enter() launches SGLang as a background HTTP server (subprocess),
-    polls /health until the model is loaded, then initialises the Python
-    orchestrator pointed at http://localhost:30000.  The orchestrator sends
-    requests to the server via the OpenAI-compatible /v1/chat/completions API.
+Modes
+-----
+INFERENCE_MODE=local  (default for GPU production)
+    Allocates an A100-80GB GPU.  Launches a SGLang HTTP server as a subprocess,
+    waits for it to become healthy, then routes all requests through it.
+    Requires: weights pre-downloaded into the Modal Volume named VOLUME_NAME.
 
-Deploy:
-    python backend/modal_app.py
+INFERENCE_MODE=api    (cheaper, no GPU)
+    No GPU allocated, no volume mounted.  The orchestrator calls the Google AI
+    API directly using GOOGLE_API_KEY from the Modal Secret.
 
-Environment — Modal Secret named 'sign-language-secrets' must contain:
-    INFERENCE_MODE=local
+Deploy commands
+---------------
+# GPU / SGLang mode:
+    INFERENCE_MODE=local python backend/modal_app.py
+
+# API mode (no GPU):
+    INFERENCE_MODE=api python backend/modal_app.py
+
+IMPORTANT: the value you set locally when running the deploy command controls
+which GPU/volume configuration Modal bakes into the deployment.  Make sure the
+same value is in your 'sign-language-secrets' Modal Secret so the container
+runtime behaviour matches the resource allocation.
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -31,58 +46,90 @@ SERVER_PORT: int = 30000
 
 _BACKEND_DIR: Path = Path(__file__).parent
 
-app = modal.App("sign-language-backend")
-model_volume = modal.Volume.from_name(VOLUME_NAME)
+# Read mode at module load time so the @app.cls decorator can conditionally
+# request GPU and volume.  This must match the INFERENCE_MODE in the Modal
+# Secret — see module docstring for deploy instructions.
+_INFERENCE_MODE: str = os.environ.get("INFERENCE_MODE", "api").lower()
 
-_backend_image = (
+app = modal.App("sign-language-backend")
+
+# Volume is only needed when weights are served locally via SGLang.
+_model_volume: modal.Volume | None = (
+    modal.Volume.from_name(VOLUME_NAME) if _INFERENCE_MODE == "local" else None
+)
+
+# Shared pip packages required by both modes.
+_COMMON_PACKAGES: list[str] = [
+    "fastapi>=0.115.12",
+    "uvicorn[standard]>=0.34.2",
+    "python-dotenv>=1.1.0",
+    "pydantic>=2.11.7",
+    "langchain-core>=0.3.55",
+    "langchain-google-genai",
+    "python-multipart>=0.0.20",
+    "Pillow>=10.0.0",
+    "requests>=2.32.0",
+]
+
+# Local mode: GPU-optimised SGLang base image with the OpenAI client for the
+# /v1/chat/completions call to the SGLang server.
+_sglang_image = (
     modal.Image.from_registry("lmsysorg/sglang:gemma4")
-    .pip_install(
-        "fastapi>=0.115.12",
-        "uvicorn[standard]>=0.34.2",
-        "python-dotenv>=1.1.0",
-        "pydantic>=2.11.7",
-        "langchain-core>=0.3.55",
-        "langchain-google-genai",
-        "openai>=1.0.0",
-        "requests>=2.32.0",
-        "python-multipart>=0.0.20",
-        "Pillow>=10.0.0",
-    )
+    .pip_install(*_COMMON_PACKAGES, "openai>=1.0.0")
     .add_local_dir(str(_BACKEND_DIR), remote_path="/root/backend")
 )
 
-
-@app.cls(
-    gpu="A100-80GB",
-    image=_backend_image,
-    volumes={WEIGHTS_PATH: model_volume},
-    secrets=[modal.Secret.from_name("sign-language-secrets")],
-    timeout=600,
-    startup_timeout=600,
-    scaledown_window=60,
+# API mode: lightweight CPU image — no CUDA, no SGLang, no openai client needed.
+_api_image = (
+    modal.Image.debian_slim(python_version="3.11")
+    .pip_install(*_COMMON_PACKAGES)
+    .add_local_dir(str(_BACKEND_DIR), remote_path="/root/backend")
 )
-class SignLanguageService:
-    """Modal service that fronts a SGLang model server with a FastAPI endpoint.
 
-    On startup, SGLang is launched as a subprocess server and the Python
-    orchestrator connects to it over localhost.  The server process is
-    terminated cleanly on container shutdown.
+_backend_image = _sglang_image if _INFERENCE_MODE == "local" else _api_image
+
+# Build @app.cls kwargs conditionally — API mode gets no GPU and no volume.
+_cls_kwargs: dict = {
+    "image": _backend_image,
+    "secrets": [modal.Secret.from_name("sign-language-secrets")],
+    "timeout": 600,
+    "startup_timeout": 600,
+    "scaledown_window": 60,
+}
+if _INFERENCE_MODE == "local":
+    _cls_kwargs["gpu"] = "A100-80GB"
+    _cls_kwargs["volumes"] = {WEIGHTS_PATH: _model_volume}
+
+
+@app.cls(**_cls_kwargs)
+class SignLanguageService:
+    """Modal service exposing a FastAPI endpoint for ASL sign analysis.
+
+    Routes to SGLang (local mode) or the Google AI API (api mode) based on
+    INFERENCE_MODE.  The mode is fixed at deploy time via the class decorator
+    kwargs and confirmed at container startup via the Modal Secret.
     """
 
     @modal.enter()
     def startup(self) -> None:
-        """Launch the SGLang server subprocess and wait until it is healthy."""
-        import os
+        """Initialize the correct inference backend based on INFERENCE_MODE."""
+        sys.path.insert(0, "/root")
+        self._mode: str = os.environ.get("INFERENCE_MODE", "api").lower()
+
+        if self._mode == "local":
+            self._start_sglang_mode()
+        else:
+            self._start_api_mode()
+
+    def _start_sglang_mode(self) -> None:
+        """Launch the SGLang subprocess server and wait until healthy."""
         import subprocess
         import time
         import requests as http
 
-        sys.path.insert(0, "/root")
-        os.environ["INFERENCE_MODE"] = "local"
-
         server_url = f"http://localhost:{SERVER_PORT}"
-
         print(f"[startup] Launching SGLang server for {MODEL_ID} from {WEIGHTS_PATH!r}...")
+
         self._server_process = subprocess.Popen([
             "python", "-m", "sglang.launch_server",
             "--model-path", WEIGHTS_PATH,
@@ -98,8 +145,8 @@ class SignLanguageService:
             exit_code = self._server_process.poll()
             if exit_code is not None:
                 raise RuntimeError(
-                    f"SGLang server process died unexpectedly (exit code {exit_code}) "
-                    f"after {attempt}s. Check logs above for the crash reason."
+                    f"SGLang server process died (exit code {exit_code}) after {attempt}s. "
+                    "Check logs above for the crash reason."
                 )
             try:
                 if http.get(health_url, timeout=2).status_code == 200:
@@ -108,18 +155,24 @@ class SignLanguageService:
             except Exception:
                 pass
             if attempt % 30 == 0 and attempt > 0:
-                print(f"[startup] Still waiting for SGLang to become healthy... ({attempt}s elapsed)")
+                print(f"[startup] Still waiting for SGLang... ({attempt}s elapsed)")
             time.sleep(1)
         else:
             raise RuntimeError("SGLang server did not become healthy within 540s")
 
         from backend.agents.orchestrator import SignAnalysisOrchestrator
         self._orchestrator = SignAnalysisOrchestrator(server_url=server_url)
-        print("[startup] Orchestrator ready. Serving requests.")
+        print("[startup] SGLang orchestrator ready.")
+
+    def _start_api_mode(self) -> None:
+        """Initialize the orchestrator for Google AI API inference (no GPU)."""
+        from backend.agents.orchestrator import SignAnalysisOrchestrator
+        self._orchestrator = SignAnalysisOrchestrator()
+        print("[startup] API-mode orchestrator ready.")
 
     @modal.exit()
     def shutdown(self) -> None:
-        """Terminate the SGLang server subprocess on container exit."""
+        """Terminate the SGLang subprocess on container exit (local mode only)."""
         if hasattr(self, "_server_process"):
             self._server_process.terminate()
             try:

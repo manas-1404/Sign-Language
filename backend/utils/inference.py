@@ -135,7 +135,7 @@ class InferenceClientFactory:
                 "GOOGLE_API_KEY environment variable is required when INFERENCE_MODE=api"
             )
         return ChatGoogleGenerativeAI(
-            model="gemma-4-e4b-it",
+            model="gemma-4-31b-it",
             google_api_key=api_key,
             temperature=0.1,
         )
