@@ -30,7 +30,7 @@ async function fetchShowcaseVideos(): Promise<ShowcaseVideos> {
 export default async function HomePage() {
   const { heroUrl, tier1Url, tier2Url } = await fetchShowcaseVideos();
   return (
-    <div className="min-h-screen bg-[#030711] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 overflow-x-hidden">
       <Nav />
       <main>
         <Hero videoUrl={heroUrl} />
@@ -48,17 +48,17 @@ export default async function HomePage() {
 // ─── Nav ─────────────────────────────────────────────────────────────────────
 
 const Nav = () => (
-  <nav className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-12 py-4 border-b border-white/[0.05] bg-[#030711]/85 backdrop-blur-xl">
+  <nav className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-12 py-4 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
     <div className="flex items-center gap-3">
       <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30 text-[15px]">
         🤟
       </div>
-      <span className="font-bold tracking-tight text-[15px]">SignCompanion</span>
+      <span className="font-bold tracking-tight text-[15px] text-slate-900">SignCompanion</span>
     </div>
-    <div className="hidden md:flex items-center gap-8 text-sm text-slate-400">
-      <a href="#how-it-works" className="hover:text-white transition-colors duration-150">How it works</a>
-      <a href="#features" className="hover:text-white transition-colors duration-150">Features</a>
-      <a href="#tiers" className="hover:text-white transition-colors duration-150">Practice tiers</a>
+    <div className="hidden md:flex items-center gap-8 text-sm text-slate-500">
+      <a href="#how-it-works" className="hover:text-slate-900 transition-colors duration-150">How it works</a>
+      <a href="#features" className="hover:text-slate-900 transition-colors duration-150">Features</a>
+      <a href="#tiers" className="hover:text-slate-900 transition-colors duration-150">Practice tiers</a>
     </div>
     <Link
       href="/practice-sign/tier-1"
@@ -74,9 +74,9 @@ const Nav = () => (
 const Hero = ({ videoUrl }: { videoUrl: string | null }) => (
   <section className="relative flex items-center pt-32 pb-16 px-6 md:px-12 overflow-hidden">
     {/* Background orbs */}
-    <div className="absolute top-1/4 -left-32 w-[700px] h-[700px] rounded-full bg-violet-600/[0.07] blur-[140px] pointer-events-none animate-pulse-glow" />
-    <div className="absolute top-1/3 -right-32 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.06] blur-[120px] pointer-events-none animate-pulse-glow" style={{ animationDelay: "2s" }} />
-    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] rounded-full bg-violet-900/[0.12] blur-[100px] pointer-events-none" />
+    <div className="absolute top-1/4 -left-32 w-[700px] h-[700px] rounded-full bg-violet-400/20 blur-[140px] pointer-events-none animate-pulse-glow" />
+    <div className="absolute top-1/3 -right-32 w-[600px] h-[600px] rounded-full bg-indigo-400/15 blur-[120px] pointer-events-none animate-pulse-glow" style={{ animationDelay: "2s" }} />
+    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] rounded-full bg-violet-300/20 blur-[100px] pointer-events-none" />
 
     <div className="relative max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-10 lg:gap-8 items-center">
       {/* Left: Copy */}
@@ -97,9 +97,9 @@ const Hero = ({ videoUrl }: { videoUrl: string | null }) => (
           {" "}you miss
         </h1>
 
-        <p className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-[480px]">
+        <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-[480px]">
           Practice ASL via your webcam. Three AI agents analyze your hand shape, facial grammar,
-          and body posture <strong className="text-slate-200">simultaneously</strong>.
+          and body posture <strong className="text-slate-900">simultaneously</strong>.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3">
@@ -112,7 +112,7 @@ const Hero = ({ videoUrl }: { videoUrl: string | null }) => (
           </Link>
           <Link
             href="/practice-sign/tier-2"
-            className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.10] font-semibold text-slate-300 hover:text-white text-[15px] transition-all duration-200"
+            className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white hover:bg-slate-100 border border-slate-200 font-semibold text-slate-700 hover:text-slate-900 text-[15px] transition-all duration-200"
           >
             Explore Tier 2 — Phrases
           </Link>
@@ -126,10 +126,10 @@ const Hero = ({ videoUrl }: { videoUrl: string | null }) => (
             { value: "<2s", label: "Feedback time" },
           ].map((stat, i) => (
             <div key={i} className="flex items-center gap-8">
-              {i > 0 && <div className="w-px h-8 bg-white/10" />}
+              {i > 0 && <div className="w-px h-8 bg-slate-200" />}
               <div>
-                <p className="text-2xl font-black text-white">{stat.value}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{stat.label}</p>
+                <p className="text-2xl font-black text-slate-900">{stat.value}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{stat.label}</p>
               </div>
             </div>
           ))}
@@ -273,7 +273,7 @@ const VideoShowcase = ({ tier1Url, tier2Url }: VideoShowcaseProps) => (
       <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-3">
         Watch the correct form.<br className="hidden sm:block" /> Then try it yourself.
       </h2>
-      <p className="text-slate-400 mb-10 max-w-md">
+      <p className="text-slate-600 mb-10 max-w-md">
         Every sign comes with a looping reference video. Know exactly what you&apos;re aiming for before you hit record.
       </p>
 
@@ -420,14 +420,14 @@ const HowItWorks = () => (
           },
         ].map((item, i) => (
           <div key={i} className="relative">
-            <div className="flex items-start gap-4 p-6 rounded-2xl bg-white/[0.02] border border-white/[0.07] hover:bg-white/[0.04] hover:border-violet-500/20 transition-all duration-200">
+            <div className="flex items-start gap-4 p-6 rounded-2xl bg-white border border-slate-200 hover:border-violet-300 hover:shadow-md transition-all duration-200">
               <div className="shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 border border-violet-500/20 flex items-center justify-center text-violet-400">
                 {item.icon}
               </div>
               <div>
                 <p className="text-[10px] text-violet-500 font-mono font-bold tracking-widest mb-1">{item.step}</p>
-                <h3 className="font-bold text-white text-lg mb-2">{item.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{item.description}</p>
+                <h3 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">{item.description}</p>
               </div>
             </div>
           </div>
@@ -482,27 +482,27 @@ const CHANNELS = [
 ] as const;
 
 const AnalysisChannels = () => (
-  <section id="features" className="py-28 px-6 md:px-12 bg-gradient-to-b from-transparent via-violet-950/[0.06] to-transparent">
+  <section id="features" className="py-16 px-6 md:px-12 bg-gradient-to-b from-transparent via-violet-50 to-transparent">
     <div className="max-w-7xl mx-auto">
       <SectionLabel>The AI engine</SectionLabel>
       <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-4 mb-4">
         Three agents. One verdict.
       </h2>
-      <p className="text-slate-400 mb-8 max-w-md">
+      <p className="text-slate-600 mb-8 max-w-md">
         Each agent returns one thing: correct or not, and why.
       </p>
 
       <div className="grid md:grid-cols-3 gap-5">
         {CHANNELS.map((ch) => (
-          <div key={ch.label} className={`rounded-2xl border bg-white/[0.02] ${ch.border} p-6 space-y-5`}>
+          <div key={ch.label} className={`rounded-2xl border bg-white shadow-sm ${ch.border} p-6 space-y-5`}>
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-xl ${ch.bg} border ${ch.border} flex items-center justify-center ${ch.color}`}>
                 {ch.icon}
               </div>
-              <span className={`font-bold text-white`}>{ch.label}</span>
+              <span className="font-bold text-slate-900">{ch.label}</span>
             </div>
 
-            <p className="text-base text-slate-400">{ch.note}</p>
+            <p className="text-base text-slate-600">{ch.note}</p>
 
             {/* Sample output */}
             <div className={`rounded-xl border ${ch.result.correct ? "bg-emerald-950/40 border-emerald-500/20" : "bg-rose-950/40 border-rose-500/25"} p-3.5`}>
@@ -589,24 +589,24 @@ interface TierCardProps {
 const TierCard = ({ tier, title, description, href, accentClass, badgeClass, borderClass, active }: TierCardProps) => {
   const inner = (
     <div
-      className={`relative h-full rounded-2xl bg-white/[0.02] border border-white/[0.07] p-7 flex flex-col gap-5 transition-all duration-200 ${
-        active ? `hover:bg-white/[0.04] ${borderClass}` : "opacity-50 cursor-not-allowed"
+      className={`relative h-full rounded-2xl bg-white border border-slate-200 p-7 flex flex-col gap-5 shadow-sm transition-all duration-200 ${
+        active ? `hover:shadow-md hover:border-slate-300 ${borderClass}` : "opacity-50 cursor-not-allowed"
       }`}
     >
-      <div className={`absolute top-0 inset-x-0 h-px rounded-t-2xl bg-gradient-to-r ${accentClass} opacity-60`} />
+      <div className={`absolute top-0 inset-x-0 h-1 rounded-t-2xl bg-gradient-to-r ${accentClass}`} />
 
       <div className="flex items-center justify-between">
         <span className={`px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest ${badgeClass}`}>
           {tier}
         </span>
         {!active && (
-          <span className="text-[10px] text-slate-600 font-semibold uppercase tracking-wider">Coming Soon</span>
+          <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Coming Soon</span>
         )}
       </div>
 
       <div className="flex-1">
-        <h3 className="text-xl font-black text-white mb-2">{title}</h3>
-        <p className="text-sm text-slate-400 leading-relaxed">{description}</p>
+        <h3 className="text-xl font-black text-slate-900 mb-2">{title}</h3>
+        <p className="text-sm text-slate-600 leading-relaxed">{description}</p>
       </div>
 
       {active && (
@@ -625,35 +625,35 @@ const TierCard = ({ tier, title, description, href, accentClass, badgeClass, bor
 const ClosingCTA = () => (
   <section className="py-16 px-6 md:px-12">
     <div className="max-w-7xl mx-auto">
-      <div className="relative rounded-3xl bg-gradient-to-br from-violet-950/60 to-indigo-950/60 border border-violet-500/20 p-10 md:p-14 overflow-hidden text-center">
+      <div className="relative rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-600 p-10 md:p-14 overflow-hidden text-center">
         {/* Background orbs */}
-        <div className="absolute top-0 left-1/4 w-72 h-72 bg-violet-600/20 rounded-full blur-[80px] animate-pulse-glow pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-indigo-600/20 rounded-full blur-[80px] animate-pulse-glow pointer-events-none" style={{ animationDelay: "2s" }} />
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-white/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-white/10 rounded-full blur-[80px] pointer-events-none" />
 
         <div className="relative">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[11px] font-semibold text-violet-400 uppercase tracking-[0.12em] mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-blink" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 text-[11px] font-semibold text-white uppercase tracking-[0.12em] mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-blink" />
             No account required
           </div>
 
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
+          <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-4 text-white">
             Ready to start signing?
           </h2>
-          <p className="text-lg text-slate-400 mb-7 max-w-md mx-auto">
+          <p className="text-lg text-violet-100 mb-7 max-w-md mx-auto">
             Open your webcam. Pick a sign. Get feedback that goes deeper.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/practice-sign/tier-1"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 font-bold text-white text-base transition-all duration-200 shadow-2xl shadow-violet-500/40 hover:-translate-y-0.5 hover:shadow-violet-500/60"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white hover:bg-slate-100 font-bold text-violet-700 text-base transition-all duration-200 shadow-xl hover:-translate-y-0.5"
             >
               Start with Tier 1 — Individual Signs
               <ArrowRight />
             </Link>
             <Link
               href="/practice-sign/tier-2"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.12] font-semibold text-slate-300 hover:text-white text-base transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 font-semibold text-white text-base transition-all duration-200"
             >
               Jump to Tier 2 — Phrases
             </Link>
@@ -667,8 +667,8 @@ const ClosingCTA = () => (
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 const Footer = () => (
-  <footer className="border-t border-white/[0.05] px-6 md:px-12 py-8">
-    <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-600">
+  <footer className="border-t border-slate-200 px-6 md:px-12 py-8">
+    <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-400">
       <div className="flex items-center gap-2.5">
         <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-[11px]">
           🤟
