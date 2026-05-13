@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sign Language Learning Companion",
   description:
-    "Practice ASL signs via your webcam and receive real-time AI feedback on hand shape, facial expression, and body posture — powered by Gemma 4.",
+    "Practice American Sign Language signs via your webcam and receive real-time AI feedback on hand shape, facial expression, and body posture — powered by Gemma 4.",
 };
 
 export default function RootLayout({

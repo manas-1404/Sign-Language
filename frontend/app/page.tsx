@@ -87,7 +87,7 @@ const Hero = ({ videoUrl }: { videoUrl: string | null }) => (
         </div>
 
         <h1 className="text-[52px] md:text-[64px] lg:text-[72px] font-black tracking-tight leading-[1.03]">
-          Learn ASL with AI that{" "}
+          Learn American Sign Language with AI that{" "}
           <span className="relative">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-indigo-400 animate-gradient-x">
               sees everything
@@ -98,7 +98,7 @@ const Hero = ({ videoUrl }: { videoUrl: string | null }) => (
         </h1>
 
         <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-[480px]">
-          Practice ASL via your webcam. Three AI agents analyze your hand shape, facial grammar,
+          Practice American Sign Language via your webcam. Three AI agents analyze your hand shape, facial grammar,
           and body posture <strong className="text-slate-900">simultaneously</strong>.
         </p>
 
@@ -455,7 +455,7 @@ const CHANNELS = [
   },
   {
     label: "Facial Grammar",
-    note: "Eyebrow raises and mouth morphemes are ASL grammar — not decoration.",
+    note: "Eyebrow raises and mouth morphemes are American Sign Language grammar — not decoration.",
     color: "text-fuchsia-600",
     border: "border-fuchsia-200",
     bg: "bg-fuchsia-100",
@@ -543,7 +543,7 @@ const PracticeTiers = () => (
         <TierCard
           tier="Tier 1"
           title="Individual Signs"
-          description="Learn 10 foundational ASL signs. Practice one at a time, retry as many times as you like."
+          description="Learn 10 foundational American Sign Language signs. Practice one at a time, retry as many times as you like."
           href="/practice-sign/tier-1"
           accentClass="from-violet-500 to-violet-600"
           badgeClass="bg-violet-500/10 border-violet-500/20 text-violet-400"
@@ -553,7 +553,7 @@ const PracticeTiers = () => (
         <TierCard
           tier="Tier 2"
           title="Short Phrases"
-          description="Practice 10 multi-sign sequences in ASL word order — structurally distinct from English."
+          description="Practice 10 multi-sign sequences in American Sign Language word order — structurally distinct from English."
           href="/practice-sign/tier-2"
           accentClass="from-indigo-500 to-indigo-600"
           badgeClass="bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
@@ -562,7 +562,7 @@ const PracticeTiers = () => (
         />
         <TierCard
           tier="Tier 3"
-          title="ASL Grammar"
+          title="American Sign Language Grammar"
           description="Full yes/no questions with sustained non-manual markers. Coming once you've nailed Tiers 1 and 2."
           href="#"
           accentClass="from-slate-600 to-slate-700"
